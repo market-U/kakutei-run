@@ -112,3 +112,6 @@ All artifacts complete. All tasks complete.
 - Show clear summary of what happened
 - If sync is requested, use openspec-sync-specs approach (agent-driven)
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting
+
+**Git Workflow**
+- `/openspec/config.yaml` の `git_workflow` セクションに定義された git ワークフロールールを必ず適用してください。
