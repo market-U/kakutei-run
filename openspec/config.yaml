@@ -39,8 +39,11 @@ git_workflow:
       description: |
         アーカイブ処理（mv コマンドによるディレクトリ移動）が完了した直後、以下の手順で PR を作成すること。
         1. アーカイブした変更内容をステージング・コミットする
-           - `git add openspec/changes/archive/YYYY-MM-DD-<change-name>/`
+           - `git rm -r openspec/changes/<change-name>/` で元ディレクトリの削除をステージする
+           - `git add openspec/changes/archive/YYYY-MM-DD-<change-name>/` でアーカイブ先をステージする
+           - `git add openspec/specs/` でスペック同期の変更もステージする（同期を行った場合）
            - `git commit -m "chore: <change-name> をアーカイブ"`
+           - **注意**: `git add` のみでは mv による削除が追跡されない。必ず `git rm -r` で元ディレクトリを明示的に削除すること。
         2. フィーチャーブランチをリモートへプッシュする
            - `git push -u origin feature/<change-name>`
         3. GitHub CLI (`gh pr create`) で develop ブランチへの PR を作成する
