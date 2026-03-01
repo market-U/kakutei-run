@@ -18,3 +18,33 @@ generation_rules:
     - 生成するすべての Markdown ファイルは markdownlint のルールに準拠してください。
       - MD041: 各ファイルの先頭行は必ずレベル1の見出し（`#`）にしてください。
       - MD040: コードブロックには必ず言語識別子を指定してください（言語不明な場合は `text` を使用）。
+
+git_workflow:
+  branch_strategy:
+    base_branch: "develop"
+    feature_prefix: "feature/"
+  notes: |
+    - `develop` ブランチは main からデプロイ設定が整ったタイミングでユーザーが手動で1回だけ作成する。
+    - スキルが自動で develop を作成してはならない。
+  rules:
+    - trigger: "openspec-propose"
+      description: |
+        新しい change ディレクトリを作成した直後、以下の手順でブランチを作成してチェックアウトすること。
+        1. `git rev-parse --verify develop` で develop ブランチの存在を確認する
+           - 存在しない場合は処理を中断し、「develop ブランチがまだ作成されていません。main でのデプロイ設定が完了したら `git checkout -b develop` で develop を作成してください。」とユーザーへ伝える
+        2. `git checkout develop` でベースブランチに移動する
+        3. `git checkout -b feature/<change-name>` でフィーチャーブランチを作成してチェックアウトする
+        4. 作成したブランチ名をユーザーへ伝える
+    - trigger: "openspec-archive-change"
+      description: |
+        アーカイブ処理（mv コマンドによるディレクトリ移動）が完了した直後、以下の手順で PR を作成すること。
+        1. アーカイブした変更内容をステージング・コミットする
+           - `git add openspec/changes/archive/YYYY-MM-DD-<change-name>/`
+           - `git commit -m "chore: <change-name> をアーカイブ"`
+        2. フィーチャーブランチをリモートへプッシュする
+           - `git push -u origin feature/<change-name>`
+        3. GitHub CLI (`gh pr create`) で develop ブランチへの PR を作成する
+           - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する
+           - ベースブランチ: develop
+           - `--fill` オプションを使用してコミット情報から本文を自動生成する
+        4. 作成した PR の URL をユーザーへ伝える
