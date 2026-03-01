@@ -85,7 +85,6 @@
 ## 12. HUD
 
 - [x] 12.1 `src/ui/HUD.ts` を作成し、レシート収集数/総数・進行距離をゲーム画面上に常時表示する
-- [ ] 12.2 魔女被弾回数をハート（❤️）などで視覚的に表示する（優先度:中）
 
 ## 13. リザルトシーン
 
@@ -97,14 +96,14 @@
 
 - [x] 14.1 canvas に `touch-action: none` と `user-select: none` を設定し、スクロール・ズームを無効化する
 - [x] 14.2 iOS Safari でのタッチイベント `preventDefault()` を確認する
-- [ ] 14.3 スマホ実機（またはデベロッパーツール）で1画面に収まることを確認する
+- [x] 14.3 スマホ実機（またはデベロッパーツール）で1画面に収まることを確認する
 
 ## 15. デプロイ設定
 
 - [x] 15.1 GitHub リポジトリを作成する
-- [ ] 15.2 Azure Static Web Apps リソースを作成し接続設定（`staticwebapp.config.json`）を追加する
+- [x] 15.2 Azure Static Web Apps リソースを作成し接続設定（`staticwebapp.config.json`）を追加する
 - [x] 15.3 GitHub Actions ワークフロー（build & deploy）を作成する
-- [ ] 15.4 `main` ブランチへの push で自動デプロイされることを確認する
+- [x] 15.4 `main` ブランチへの push で自動デプロイされることを確認する
 
 ## 16. 不具合修正・仕様変更
 
@@ -112,7 +111,7 @@
 - [x] 16.2 プレーヤーの初期スポーン Y 座標を `GROUND_Y` に変更し、`setOrigin(0.5, 1)` を設定して足底を接地基準にする（`Player.ts`）
 - [x] 16.3 敵キャラの初期距離をプレーヤー新位置（`CANVAS_W/2`）に合わせて再計算し、画面左端から約50px見える位置にする（`INITIAL_ENEMY_DISTANCE ≈ CANVAS_W/2 + スプライト半幅`）
 - [x] 16.4 `MapGenerator` の最小配置X（`minX`）をゲーム開始時の初期スクリーン幅（`CANVAS_W = 960`）以上に変更し、ゲーム開始直後の画面にオブジェクトが表示されないようにする
-- [ ] 16.5 スマートフォン縦画面フルスクリーン対応: `index.html` の viewport meta に `user-scalable=no` を追加し、CSS と Phaser Scale 設定を見直して縦画面でもゲームが全画面で表示されるよう対応する
+- [x] 16.5 スマートフォン縦画面フルスクリーン対応: `index.html` の viewport meta に `user-scalable=no` を追加し、CSS と Phaser Scale 設定を見直して縦画面でもゲームが全画面で表示されるよう対応する
 - [x] 16.6 `Witch` / `Receipt` の `getBounds()` を `Phaser.GameObjects.Sprite` / `Image` の基底メソッドと衝突しない名前（例: `getHitBounds()`）にリネームし、`CollisionManager` での呼び出しも合わせて修正する（TypeScript 型エラー解消）
 - [x] 16.7 `vite.config.ts` の `test` プロパティを削除し、`vitest.config.ts` を独立ファイルとして作成する（`defineConfig` を `vitest/config` からインポートすることで型エラーを解消）
 - [x] 16.8 HUD から❤️表示を完全に削除する（`HUD.ts` の `witchHitText` フィールド・生成コード・`setWitchHitCount()` を削除し、`GameScene.ts` の `hud.setWitchHitCount()` 呼び出しも削除）
