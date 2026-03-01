@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { AssetKeys, FrameCount } from "../assets/AssetKeys";
 import { gameConfig } from "../config/gameConfig";
-import { calcJumpVelocity } from "../systems/gameUtils";
+import { calcJumpVelocity, calcChargeScale } from "../systems/gameUtils";
 import type { DifficultyEntry } from "../config/difficultyConfig";
 import { calcWitchSlowDuration } from "../config/gameConfig";
 
@@ -101,7 +101,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           end: FrameCount.PLAYER_GOAL - 1,
         }),
         frameRate: 8,
-        repeat: -1,
+        repeat: 0, // 1回再生後、最終フレームに固定
       });
     }
   }
@@ -169,6 +169,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     body.setVelocityY(-velocity);
     this.grounded = false;
     this.chargeStartTime = null;
+    // ジャンプ発動時にアニメーションを停止し、scaleY をリセット
+    this.anims.stop();
+    this.setScale(1, 1);
   }
 
   /**
@@ -293,10 +296,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (spaceJustDown) this.startCharge();
     if (spaceJustUp) this.releaseJump();
 
-    // 空中アニメーション: ジャンプ中は通常走行を維持（fall はゲームオーバー時専用）
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    if (!this.grounded && body.velocity.y > 0) {
-      // 下降中のみ変化させたい場合はここで処理できる
+    // チャージ量に連動して Y 方向にスプライトを縮小（下端起点）
+    const chargeAmount = this.getChargeAmount();
+    if (chargeAmount > 0) {
+      this.setScale(1, calcChargeScale(chargeAmount));
+    } else {
+      this.setScale(1, 1);
     }
   }
 }
