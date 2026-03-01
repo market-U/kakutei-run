@@ -1,0 +1,29 @@
+# 依存パッケージ
+node_modules/
+
+# ビルド成果物
+dist/
+
+# Vite キャッシュ
+.vite/
+
+# TypeScript ビルドキャッシュ
+*.tsbuildinfo
+
+# テスト・カバレッジ
+coverage/
+
+# 環境変数
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# エディタ
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/

@@ -101,9 +101,9 @@
 
 ## 15. デプロイ設定
 
-- [ ] 15.1 GitHub リポジトリを作成する
+- [x] 15.1 GitHub リポジトリを作成する
 - [ ] 15.2 Azure Static Web Apps リソースを作成し接続設定（`staticwebapp.config.json`）を追加する
-- [ ] 15.3 GitHub Actions ワークフロー（build & deploy）を作成する
+- [x] 15.3 GitHub Actions ワークフロー（build & deploy）を作成する
 - [ ] 15.4 `main` ブランチへの push で自動デプロイされることを確認する
 
 ## 16. 不具合修正・仕様変更
