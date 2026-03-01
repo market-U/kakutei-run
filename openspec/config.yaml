@@ -1,0 +1,20 @@
+schema: spec-driven
+
+project_settings:
+  name: "Kakutei-Run"
+  language: "ja"
+  tech_stack:
+    game_engine: "Phaser 3"
+    language: "TypeScript"
+    build_tool: "Vite"
+    test_framework: "Vitest"
+    deploy_target: "Azure Static Web Apps"
+
+generation_rules:
+  instructions: |
+    - すべての対話は日本語で行ってください。
+    - 生成されるコード内のコメント、ドキュメント（JSDoc等）、コミットメッセージはすべて日本語で記述してください。
+    - エラーメッセージやログ出力のテキストも日本語をデフォルトとしてください。
+    - 生成するすべての Markdown ファイルは markdownlint のルールに準拠してください。
+      - MD041: 各ファイルの先頭行は必ずレベル1の見出し（`#`）にしてください。
+      - MD040: コードブロックには必ず言語識別子を指定してください（言語不明な場合は `text` を使用）。
