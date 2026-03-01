@@ -85,6 +85,8 @@ export class Enemy extends Phaser.GameObjects.Sprite {
   stopChasing(): void {
     this.chasing = false;
     this.stopped = true;
+    // 到達後はアニメーションを停止
+    this.anims.stop();
   }
 
   /**

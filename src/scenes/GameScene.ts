@@ -280,6 +280,8 @@ export class GameScene extends Phaser.Scene {
     this.state = "game_over";
     this.scrollManager.stop();
     this.enemy.stopChasing();
+    // プレーヤーのアニメーションも停止
+    this.player.anims.stop();
     this.time.delayedCall(2000, () => {
       this.scene.start("ResultScene", {
         result: "gameover",
