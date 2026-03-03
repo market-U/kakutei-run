@@ -76,8 +76,8 @@ export class Witch extends Phaser.GameObjects.Sprite {
   }
 
   getHitBounds(): Phaser.Geom.Rectangle {
-    const hw = (this.displayWidth * 0.6) / 2;
-    const hh = (this.displayHeight * 0.6) / 2;
+    const hw = (this.displayWidth * 0.5) / 2;
+    const hh = (this.displayHeight * 0.5) / 2;
     return new Phaser.Geom.Rectangle(this.x - hw, this.y - hh, hw * 2, hh * 2);
   }
 }
