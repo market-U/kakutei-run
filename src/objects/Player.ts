@@ -4,24 +4,21 @@ import { gameConfig } from "../config/gameConfig";
 import { calcJumpVelocity, calcChargeScale } from "../systems/gameUtils";
 import type { DifficultyEntry } from "../config/difficultyConfig";
 import { calcWitchSlowDuration } from "../config/gameConfig";
+import { PlayerStateManager } from "./PlayerStateManager";
 
 /** プレーヤーのアニメーション状態 */
 type PlayerAnim = "run" | "back_pain" | "fall" | "goal";
 
 /** プレーヤークラス */
 export class Player extends Phaser.Physics.Arcade.Sprite {
+  /** 状態管理 */
+  private ps = new PlayerStateManager();
   /** ジャンプ押下開始時刻 (ms)、押していない場合は null */
   private chargeStartTime: number | null = null;
-  /** 着地しているか */
-  private grounded = false;
-  /** 腰痛スロー中か */
-  private isBackPain = false;
   /** 腰痛タイマー */
   private backPainTimer: Phaser.Time.TimerEvent | null = null;
   /** 腰痛被弾回数 */
   private witchHitCount = 0;
-  /** ゲームが終了状態か（入力無効） */
-  private gameOver = false;
   /** ジャンプ無効フラグ（Enemy 追跡中などに使用） */
   private jumpDisabled = false;
 
@@ -101,7 +98,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           end: FrameCount.PLAYER_GOAL - 1,
         }),
         frameRate: 8,
-        repeat: 0, // 1回再生後、最終フレームに固定
+        repeat: -1, // ループ再生
       });
     }
   }
@@ -142,21 +139,21 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   // ジャンプ
   // -------------------------------------------------
   private startCharge(): void {
-    if (this.gameOver) return;
+    if (this.ps.gameOver) return;
     if (this.jumpDisabled) return;
-    if (!this.grounded) return; // 空中では受け付けない
+    if (!this.ps.grounded) return; // 空中では受け付けない
     if (this.chargeStartTime !== null) return;
     this.chargeStartTime = this.scene.time.now;
   }
 
   private releaseJump(): void {
-    if (this.gameOver) return;
+    if (this.ps.gameOver) return;
     if (this.jumpDisabled) {
       this.chargeStartTime = null;
       return;
     }
     if (this.chargeStartTime === null) return;
-    if (!this.grounded) {
+    if (!this.ps.grounded) {
       this.chargeStartTime = null;
       return;
     }
@@ -167,9 +164,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocityY(-velocity);
-    this.grounded = false;
+    this.ps.onJump();
     this.chargeStartTime = null;
-    // ジャンプ発動時にアニメーションを停止し、scaleY をリセット
+    // ジャンプ発動時にアニメーションを停止し、scale をリセット
     this.anims.stop();
     this.setScale(1, 1);
   }
@@ -194,23 +191,24 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   // 着地
   // -------------------------------------------------
   onLanded(): void {
-    this.grounded = true;
+    const action = this.ps.onLanded();
+    if (action === "none") return;
     this.chargeStartTime = null;
-    this.playAnim(this.isBackPain ? "back_pain" : "run");
+    this.playAnim(action === "play_back_pain" ? "back_pain" : "run");
   }
 
   isOnGround(): boolean {
-    return this.grounded;
+    return this.ps.grounded;
   }
 
   // -------------------------------------------------
   // 腰痛
   // -------------------------------------------------
   activateBackPain(): void {
-    if (this.gameOver) return;
+    const action = this.ps.activateBackPain();
+    if (action === "none") return;
 
     this.witchHitCount++;
-    this.isBackPain = true;
 
     const slowDuration = calcWitchSlowDuration(
       this.difficulty,
@@ -225,15 +223,21 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.backPainTimer = this.scene.time.delayedCall(
       slowDuration * 1000,
       () => {
-        this.isBackPain = false;
         this.backPainTimer = null;
-        if (!this.gameOver && this.grounded) {
+        const timerAction = this.ps.deactivateBackPain();
+        if (timerAction === "play_run") {
           this.playAnim("run");
         }
       },
     );
 
-    this.playAnim("back_pain");
+    if (action === "play_back_pain") {
+      this.playAnim("back_pain");
+    } else {
+      // 空中被弾: back_pain の 1フレーム目を表示して停止
+      this.play("player_back_pain");
+      this.anims.stop();
+    }
 
     // スクロール速度低下はイベントで通知（GameScene が処理）
     this.emit("backPainActivated", {
@@ -247,22 +251,32 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   isBackPainActive(): boolean {
-    return this.isBackPain;
+    return this.ps.isBackPain;
   }
 
   // -------------------------------------------------
   // ゲームオーバー / ゴール
   // -------------------------------------------------
   triggerFall(): void {
-    if (this.gameOver) return;
-    this.gameOver = true;
+    const action = this.ps.triggerFall();
+    if (action === "none") return;
+    this.setScale(1, 1);
     this.playAnim("fall");
     this.emit("fell");
   }
 
   triggerGoal(): void {
-    if (this.gameOver) return;
-    this.gameOver = true;
+    const action = this.ps.triggerGoal();
+    if (action === "none") return;
+    this.setScale(1, 1);
+    this.playAnim("goal");
+  }
+
+  triggerEnemyCaught(): void {
+    const action = this.ps.triggerEnemyCaught();
+    if (action === "none") return;
+    // reset_scale_and_play_goal: falling=false 経由
+    this.setScale(1, 1);
     this.playAnim("goal");
   }
 
@@ -278,7 +292,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           : state === "fall"
             ? "player_fall"
             : "player_goal";
-    if (this.anims.currentAnim?.key !== key) {
+    // 同一キーでも停止中であれば再起動する
+    if (this.anims.currentAnim?.key !== key || !this.anims.isPlaying) {
       this.play(key);
     }
   }
@@ -287,7 +302,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   // 毎フレーム更新
   // -------------------------------------------------
   update(): void {
-    if (this.gameOver) return;
+    if (this.ps.gameOver) return;
 
     // キーボード入力（スペースキー）
     const spaceJustDown = Phaser.Input.Keyboard.JustDown(this.keySpace);
