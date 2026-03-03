@@ -75,7 +75,7 @@
 #### Scenario: 敵キャラクター到達によるゲームオーバー（S1/S2/S3/S4 → S7）
 
 - **WHEN** 敵キャラクターがプレーヤーに到達し `enemyReached` イベントが発火する（`falling=false` の場合）
-- **THEN** `gameOver=true` となり `player_goal` アニメーションがループ再生される
+- **THEN** `gameOver=true` となりアニメーションが停止される（現在フレームで固定）
 - **AND** スプライトは等倍（`scaleX=1.0, scaleY=1.0`）にリセットされる
 
 #### Scenario: 転倒後の敵キャラクター到達（S5 → S7）

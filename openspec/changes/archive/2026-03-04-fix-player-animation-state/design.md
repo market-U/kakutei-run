@@ -60,7 +60,7 @@ S1 / S2 のチャージ中以外では常に `setScale(1, 1)`（X/Y 両方）を
 
 `triggerEnemyCaught()` 呼び出し時：
 
-- `falling=false`（S1/S2/S3/S4 経由）→ `player_goal` をループ再生
+- `falling=false`（S1/S2/S3/S4 経由）→ `setScale(1, 1)` して `anims.stop()`（現在フレームのまま固定）
 - `falling=true`（S5 経由）→ アニメーションは変更しない（`player_fall` 最終フレーム固定のまま）
 
 ### Decision 5: S6 のアニメーション仕様
@@ -94,7 +94,7 @@ S1 / S2 のチャージ中以外では常に `setScale(1, 1)`（X/Y 両方）を
 | S5 | player_fall | 1回 → 最終フレーム固定 | 1.0 |
 | S6 | player_goal | ループ | 1.0 |
 | S7（S5経由） | player_fall 最終フレーム固定 | ─ | 1.0 |
-| S7（その他経由） | player_goal | ループ | 1.0 |
+| S7（その他経由） | 現在フレーム固定 | ― | 1.0 |
 
 ---
 
