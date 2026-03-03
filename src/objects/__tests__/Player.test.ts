@@ -164,12 +164,12 @@ describe("PlayerStateManager: deactivateBackPain タイマー満了 (タスク 9
 });
 
 describe("PlayerStateManager: triggerEnemyCaught (タスク 9.8, 9.9)", () => {
-  it("9.8: falling=false のとき triggerEnemyCaught は gameOver=true になり reset_scale_and_play_goal を返す (S1→S7)", () => {
+  it("9.8: falling=false のとき triggerEnemyCaught は gameOver=true になり reset_scale_and_stop を返す (S1→S7, 現在フレーム固定)", () => {
     const ps = new PlayerStateManager();
     ps._setGrounded(true);
     const action = ps.triggerEnemyCaught();
     expect(ps.gameOver).toBe(true);
-    expect(action).toBe("reset_scale_and_play_goal");
+    expect(action).toBe("reset_scale_and_stop");
   });
 
   it("9.9: falling=true のとき triggerEnemyCaught は gameOver=true になるが sprite 変更なし (S5→S7)", () => {
