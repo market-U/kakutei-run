@@ -149,10 +149,10 @@ saveSpritesheet("player_fall.png", 64, 96, 5, [80, 160, 240, 255]);
 saveSpritesheet("player_goal.png", 64, 96, 5, [80, 160, 240, 255]);
 saveSpritesheet("player_back_pain.png", 64, 96, 6, [100, 140, 200, 255]);
 saveSpritesheet("enemy_run.png", 64, 96, 6, [220, 80, 80, 255]); // 赤
-saveSpritesheet("witch_float.png", 64, 64, 3, [180, 80, 220, 255]); // 紫
+saveSpritesheet("witch_float.png", 64, 64, 4, [180, 80, 220, 255]); // 紫
 
 // Static images
-saveSolid("tax_office.png", 128, 128, [180, 140, 80, 255]); // 黄土色
+saveSolid("tax_office.png", 225, 225, [180, 140, 80, 255]); // 黄土色
 saveSolid("receipt_1.png", 32, 48, [255, 255, 200, 255]); // 薄黄
 saveSolid("receipt_2.png", 32, 48, [240, 255, 200, 255]); // 薄緑
 saveSolid("receipt_3.png", 32, 48, [255, 240, 200, 255]); // 薄橙
@@ -161,8 +161,8 @@ saveSolid("stone_2.png", 48, 32, [140, 120, 100, 255]);
 saveSolid("stone_3.png", 48, 32, [120, 100, 80, 255]);
 
 // Backgrounds (幅 2048 以上)
-saveSolid("bg_far.png", 2048, 540, [135, 206, 250, 255]); // 空色
-saveSolid("bg_near.png", 2048, 540, [100, 180, 100, 255]); // 緑
+saveSolid("bg_far.png", 3486, 540, [135, 206, 250, 255]); // 空色
+saveSolid("bg_near.png", 5918, 540, [100, 180, 100, 255]); // 緑
 saveSolid("ground.png", 2048, 64, [120, 90, 60, 255]); // 茶
 
 console.log("Done!");
