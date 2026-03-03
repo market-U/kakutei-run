@@ -275,9 +275,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   triggerEnemyCaught(): void {
     const action = this.ps.triggerEnemyCaught();
     if (action === "none") return;
-    // reset_scale_and_play_goal: falling=false 経由
+    // reset_scale_and_stop: falling=false 経由（現在フレームで固定）
     this.setScale(1, 1);
-    this.playAnim("goal");
+    this.anims.stop();
   }
 
   // -------------------------------------------------

@@ -7,7 +7,7 @@ import type { DifficultyEntry } from "./difficultyConfig";
 export const gameConfig = {
   // ---- 物理 ----
   /** 重力加速度 (px/s²) */
-  gravity: 2200,
+  gravity: 2400,
 
   // ---- ジャンプ ----
   /** チャージなし(タップ)時のジャンプ初速 (px/s, 上方向) */
@@ -15,14 +15,14 @@ export const gameConfig = {
   /** フルチャージ時のジャンプ初速 (px/s, 上方向) */
   maxJumpVelocity: 1200,
   /** フルチャージに要する時間 (ms) */
-  maxChargeTime: 800,
+  maxChargeTime: 500,
 
   // ---- 魔女 腰痛ペナルティ ----
   /**
    * 魔女被弾時のスクロール速度低下割合 (0〜1)
    * 例: 0.2 → 20% 低下
    */
-  witchSpeedReduction: 0.25,
+  witchSpeedReduction: 0.18,
   /**
    * 魔女1回被弾で縮まる敵との距離の割合 (0〜1)
    * 3回で追い付かれる場合は 1/3 ≒ 0.333
@@ -35,9 +35,9 @@ export const gameConfig = {
   /** 魔女のスクロール速度係数 最大値 */
   witchScrollSpeedFactorMax: 1.2,
   /** 魔女の出現 Y 座標 最小値 (px, 上端が0) */
-  witchYMin: 80,
+  witchYMin: 180,
   /** 魔女の出現 Y 座標 最大値 (px) */
-  witchYMax: 360,
+  witchYMax: 400,
 
   // ---- レシート 出現・移動 ----
   /** レシートのスクロール速度係数 最小値 */

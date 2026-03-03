@@ -21,7 +21,7 @@ export type AnimAction =
   | "play_goal"
   | "reset_scale_and_play_goal"
   | "reset_scale_and_play_fall"
-  | "reset_scale_and_play_goal_or_keep"
+  | "reset_scale_and_stop"
   | "none";
 
 export class PlayerStateManager {
@@ -92,14 +92,15 @@ export class PlayerStateManager {
 
   /**
    * 敵到達によるゲームオーバー（S1/S2/S3/S4 → S7 / S5 → S7）
-   * falling=true のときは sprite を変更しない。
+   * S7 は現在フレームで固定。falling=true のときは sprite を変更しない。
    * @returns 実行すべきアクション
    */
   triggerEnemyCaught(): AnimAction {
     if (this._gameOver) return "none";
     this._gameOver = true;
     if (!this._falling) {
-      return "reset_scale_and_play_goal";
+      // scaleをリセットしてアニメーションを停止（現在フレームで固定）
+      return "reset_scale_and_stop";
     }
     // S5経由: player_fall 最終フレームを維持
     return "none";
