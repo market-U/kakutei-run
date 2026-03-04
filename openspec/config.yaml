@@ -60,11 +60,10 @@ git_workflow:
              - "Bug" ラベルなし: `feature/issue-<N>-<name>`
            - Issue番号がない場合: `feature/<name>`
         4. 決定したブランチ名で `git checkout -b <branch>` を実行する
-        4. ブランチ作成後、change ディレクトリの内容をコミットする
+        5. ブランチ作成後、change ディレクトリの内容をコミットする
            - `git add openspec/changes/<change-dir>/`
            - `git commit -m "chore: <change-dir> の change を作成"`
-        5. 作成したブランチ名をユーザーへ伝える
-    - trigger: "openspec-apply-change (Task N 完了時)"
+        6. 作成したブランチ名をユーザーへ伝える
     - trigger: "openspec-apply-change (Task N 完了時)"
       description: |
         tasks.md の ## Task N（大項目）が完了したタイミングで実装コミットを行うこと。
