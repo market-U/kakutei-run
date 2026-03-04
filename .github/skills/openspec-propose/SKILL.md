@@ -70,6 +70,14 @@ When ready to implement, run /opsx:apply
       - Apply `context` and `rules` as constraints - but do NOT copy them into the file
       - Show brief progress: "Created <artifact-id>"
 
+   a-2. **After creating `proposal` artifact, pause for user review**
+      - proposal.md が生成されたら、次のアーティファクトへ進む前に必ず一時停止すること
+      - proposal.md の内容を要約してユーザーに提示する
+      - **AskUserQuestion tool** を使って確認を求める:
+        > "proposal.md を作成しました。内容を確認してください。このまま design・tasks の作成に進みますか？修正があればお知らせください。"
+      - ユーザーから修正指示があった場合は proposal.md を更新してから再度確認する
+      - ユーザーが承認したら次のアーティファクトへ進む
+
    b. **Continue until all `applyRequires` artifacts are complete**
       - After creating each artifact, re-run `openspec status --change "<name>" --json`
       - Check if every artifact ID in `applyRequires` has `status: "done"` in the artifacts array
