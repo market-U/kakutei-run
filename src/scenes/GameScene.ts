@@ -249,11 +249,10 @@ export class GameScene extends Phaser.Scene {
     this.player.setJumpDisabled(true);
   }
 
-  private onWitchHit(hitCount: number): void {
-    // 3回被弾でゲームオーバー
-    if (hitCount >= 3) {
-      this.onEnemyReached();
-    }
+  private onWitchHit(_hitCount: number): void {
+    // ゲームオーバーは CollisionManager.checkEnemyReached() による
+    // Enemy・Player の矩形接触判定のみで発火させる。
+    // 魔女被弾回数（hitCount）を根拠に直接ゲームオーバーにしてはならない。
   }
 
   private onBackPainStart(slowDuration: number): void {
@@ -280,6 +279,7 @@ export class GameScene extends Phaser.Scene {
     this.state = "game_over";
     this.scrollManager.stop();
     this.enemy.stopChasing();
+    this.player.triggerEnemyCaught();
     this.time.delayedCall(2000, () => {
       this.scene.start("ResultScene", {
         result: "gameover",

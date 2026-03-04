@@ -24,7 +24,8 @@
 
 ### 難易度
 
-Easy / Normal / Hard の3段階。スクロール速度・障害物密度・レシート枚数などが変化します。
+3段階。スクロール速度・障害物密度・レシート枚数などが変化します。
+詳細は [`src/config/difficultyConfig.ts`](src/config/difficultyConfig.ts) を参照してください。
 
 ## 技術スタック
 
@@ -51,6 +52,9 @@ npm run generate-placeholders
 ```bash
 # 開発サーバー起動 (http://localhost:5173)
 npm run dev
+
+# 開発サーバー起動（LAN公開モード・他デバイスからのアクセス可）
+npm run dev:host
 ```
 
 ## テスト

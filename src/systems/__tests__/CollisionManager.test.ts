@@ -41,3 +41,22 @@ describe("rectsOverlap", () => {
     expect(rectsOverlap(a, b)).toBe(true);
   });
 });
+
+/**
+ * Enemy.stopChasing() 後のアニメーション停止
+ *
+ * Enemy は Phaser.GameObjects.Sprite を継承しているため、
+ * node テスト環境では Phaser を利用できずインスタンス化できない。
+ * 以下のシナリオはゲーム実行時の統合テスト・手動確認で検証する。
+ *   - Enemy.stopChasing() を呼ぶと this.anims.stop() が実行されること
+ *   - GameScene.onEnemyReached() 内で enemy.stopChasing() に加え
+ *     player.anims.stop() も呼ばれること
+ */
+describe("Enemy アニメーション停止（統合テスト要件）", () => {
+  it.todo(
+    "Enemy.stopChasing() 後に anims.stop() が呼ばれること（Phaser 依存 → 統合テストで確認）",
+  );
+  it.todo(
+    "onEnemyReached イベント後に Player のアニメーションも停止すること（Phaser 依存 → 統合テストで確認）",
+  );
+});
