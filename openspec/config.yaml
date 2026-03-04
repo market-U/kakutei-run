@@ -22,32 +22,96 @@ generation_rules:
 git_workflow:
   branch_strategy:
     base_branch: "develop"
-    feature_prefix: "feature/"
+  naming:
+    change_dir: "<issue>-<name> (Issue番号がある場合) / <name> (Issue番号がない場合)"
+    archive_dir: "YYYY-MM-DD-<issue>-<name> (Issue番号がある場合) / YYYY-MM-DD-<name> (Issue番号がない場合)"
+    branch: |
+      ブランチのプレフィックスは以下のルールで決定する:
+      - Issue番号があり、そのIssueに "Bug" ラベルが付いている場合: `fix/<issue>-<name>`
+      - 上記以外（Issueなし、またはBugラベルなし）: `feature/<issue>-<name>` / `feature/<name>`
+      判定方法: `gh issue view <issue> --json labels --jq '[.labels[].name]'` で "Bug" が含まれるか確認する
+  commit_convention:
+    prefixes:
+      - "feat: 新機能・新しい振る舞いの追加"
+      - "fix: バグ修正"
+      - "refactor: 機能変更を伴わないコード整理"
+      - "test: テストの追加・修正"
+      - "chore: ビルド設定・ドキュメント・openspec 管理など"
+    notes: |
+      - プレフィックスは AI がコミット内容から判断して付ける。厳格なチェックは行わない。
+      - コミットメッセージ本文（subject）は日本語で記述する。
+      - タスクコミットの形式: `<prefix>: Task N - <タスクタイトル>`
   notes: |
     - `develop` ブランチは main からデプロイ設定が整ったタイミングでユーザーが手動で1回だけ作成する。
     - スキルが自動で develop を作成してはならない。
+    - Issue番号はスキル呼び出し時にユーザーが渡す。渡されない場合は Issue なし扱いとする。
   rules:
-    - trigger: "openspec-propose"
+    - trigger: "openspec-explore / openspec-propose (changeディレクトリ作成時)"
       description: |
-        新しい change ディレクトリを作成した直後、以下の手順でブランチを作成してチェックアウトすること。
+        explore または propose で change ディレクトリを新規作成した直後、以下の手順でブランチを作成してチェックアウトすること。
+        explore から propose に進む場合は、既に同 change のブランチが存在するためブランチ作成はスキップし、そのブランチで継続する。
+
         1. `git rev-parse --verify develop` で develop ブランチの存在を確認する
            - 存在しない場合は処理を中断し、「develop ブランチがまだ作成されていません。main でのデプロイ設定が完了したら `git checkout -b develop` で develop を作成してください。」とユーザーへ伝える
         2. `git checkout develop` でベースブランチに移動する
-        3. `git checkout -b feature/<change-name>` でフィーチャーブランチを作成してチェックアウトする
-        4. 作成したブランチ名をユーザーへ伝える
+        3. ブランチ名を決定する（naming.branch のルールに従う）
+           - Issue番号がある場合: `gh issue view <issue> --json labels --jq '[.labels[].name]'` で "Bug" ラベルの有無を確認する
+             - "Bug" ラベルあり: `fix/<issue>-<name>`
+             - "Bug" ラベルなし: `feature/<issue>-<name>`
+           - Issue番号がない場合: `feature/<name>`
+        4. 決定したブランチ名で `git checkout -b <branch>` を実行する
+        4. ブランチ作成後、change ディレクトリの内容をコミットする
+           - `git add openspec/changes/<change-dir>/`
+           - `git commit -m "chore: <change-dir> の change を作成"`
+        5. 作成したブランチ名をユーザーへ伝える
+    - trigger: "openspec-apply-change (Task N 完了時)"
+    - trigger: "openspec-apply-change (Task N 完了時)"
+      description: |
+        tasks.md の ## Task N（大項目）が完了したタイミングで実装コミットを行うこと。
+        1. `git add -A` で変更をステージする
+        2. `git commit -m "<prefix>: Task N - <タスクタイトル>"` でコミットする
+           - prefix は commit_convention に従い AI が判断する
+           - タスクタイトルは tasks.md の ## Task N の見出しテキストを使う
+        - タスクが複数の小項目（N-1, N-2...）で構成される場合も、大項目完了時に1コミットにまとめる
     - trigger: "openspec-archive-change"
       description: |
         アーカイブ処理（mv コマンドによるディレクトリ移動）が完了した直後、以下の手順で PR を作成すること。
+        0. アーカイブ前に未コミットの変更がないか確認する
+           - `git status` で未コミットファイルがある場合は `git add -A && git commit -m "chore: アーカイブ前の残作業をコミット"` を実行する
         1. アーカイブした変更内容をステージング・コミットする
-           - `git rm -r openspec/changes/<change-name>/` で元ディレクトリの削除をステージする
-           - `git add openspec/changes/archive/YYYY-MM-DD-<change-name>/` でアーカイブ先をステージする
+           - `git rm -r openspec/changes/<change-dir>/` で元ディレクトリの削除をステージする
+           - `git add openspec/changes/archive/YYYY-MM-DD-<change-dir>/` でアーカイブ先をステージする
            - `git add openspec/specs/` でスペック同期の変更もステージする（同期を行った場合）
-           - `git commit -m "chore: <change-name> をアーカイブ"`
+           - `git commit -m "chore: <change-dir> をアーカイブ"`
            - **注意**: `git add` のみでは mv による削除が追跡されない。必ず `git rm -r` で元ディレクトリを明示的に削除すること。
         2. フィーチャーブランチをリモートへプッシュする
-           - `git push -u origin feature/<change-name>`
+           - `git push -u origin <branch>` （ブランチ名は naming.branch のルールで決定済みのもの）
         3. GitHub CLI (`gh pr create`) で develop ブランチへの PR を作成する
+           - **必ずヒアドキュメント + stdin（`--body-file -`）を使うこと。`--body` に文字列を直接渡すと zsh のグロブ展開で失敗する。**
            - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する
-           - ベースブランチ: develop
-           - `--fill` オプションを使用してコミット情報から本文を自動生成する
+           - Issue番号がある場合: 事前に以下でIssueのラベルを取得し、`--label` に渡す
+             ```sh
+             labels=$(gh issue view <issue> --json labels --jq '[.labels[].name] | join(",")' 2>/dev/null)
+             ```
+             `$labels` が空でない場合は `--label "$labels"` を追加する（空の場合は省略）
+           - コマンド形式:
+             ```sh
+             gh pr create \
+               --base develop \
+               --title "タイトル" \
+               --label "$labels" \
+               --body-file - << 'EOF'
+             ## 概要
+
+             （proposal.md をもとにした概要）
+
+             Closes #<issue>   ← Issue番号がある場合のみ記載
+
+             ## 主な変更内容
+
+             - ...
+             EOF
+             ```
+           - Issue番号がない場合は `Closes #...` 行を省略する
+           - `/tmp` などへの中間ファイル書き出しは禁止（古い内容が混入する原因になる）
         4. 作成した PR の URL をユーザーへ伝える
