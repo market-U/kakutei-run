@@ -23,13 +23,13 @@ git_workflow:
   branch_strategy:
     base_branch: "develop"
   naming:
-    change_dir: "<issue>-<name> (Issue番号がある場合) / <name> (Issue番号がない場合)"
-    archive_dir: "YYYY-MM-DD-<issue>-<name> (Issue番号がある場合) / YYYY-MM-DD-<name> (Issue番号がない場合)"
+    change_dir: "issue-<N>-<name> (Issue番号がある場合) / <name> (Issue番号がない場合)"
+    archive_dir: "YYYY-MM-DD-issue-<N>-<name> (Issue番号がある場合) / YYYY-MM-DD-<name> (Issue番号がない場合)"
     branch: |
       ブランチのプレフィックスは以下のルールで決定する:
-      - Issue番号があり、そのIssueに "Bug" ラベルが付いている場合: `fix/<issue>-<name>`
-      - 上記以外（Issueなし、またはBugラベルなし）: `feature/<issue>-<name>` / `feature/<name>`
-      判定方法: `gh issue view <issue> --json labels --jq '[.labels[].name]'` で "Bug" が含まれるか確認する
+      - Issue番号があり、そのIssueに "Bug" ラベルが付いている場合: `fix/issue-<N>-<name>`
+      - 上記以外（Issueなし、またはBugラベルなし）: `feature/issue-<N>-<name>` / `feature/<name>`
+      判定方法: `gh issue view <N> --json labels --jq '[.labels[].name]'` で "Bug" が含まれるか確認する
   commit_convention:
     prefixes:
       - "feat: 新機能・新しい振る舞いの追加"
@@ -55,9 +55,9 @@ git_workflow:
            - 存在しない場合は処理を中断し、「develop ブランチがまだ作成されていません。main でのデプロイ設定が完了したら `git checkout -b develop` で develop を作成してください。」とユーザーへ伝える
         2. `git checkout develop` でベースブランチに移動する
         3. ブランチ名を決定する（naming.branch のルールに従う）
-           - Issue番号がある場合: `gh issue view <issue> --json labels --jq '[.labels[].name]'` で "Bug" ラベルの有無を確認する
-             - "Bug" ラベルあり: `fix/<issue>-<name>`
-             - "Bug" ラベルなし: `feature/<issue>-<name>`
+           - Issue番号がある場合: `gh issue view <N> --json labels --jq '[.labels[].name]'` で "Bug" ラベルの有無を確認する
+             - "Bug" ラベルあり: `fix/issue-<N>-<name>`
+             - "Bug" ラベルなし: `feature/issue-<N>-<name>`
            - Issue番号がない場合: `feature/<name>`
         4. 決定したブランチ名で `git checkout -b <branch>` を実行する
         4. ブランチ作成後、change ディレクトリの内容をコミットする
@@ -91,7 +91,7 @@ git_workflow:
            - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する
            - Issue番号がある場合: 事前に以下でIssueのラベルを取得し、`--label` に渡す
              ```sh
-             labels=$(gh issue view <issue> --json labels --jq '[.labels[].name] | join(",")' 2>/dev/null)
+             labels=$(gh issue view <N> --json labels --jq '[.labels[].name] | join(",")' 2>/dev/null)
              ```
              `$labels` が空でない場合は `--label "$labels"` を追加する（空の場合は省略）
            - コマンド形式:
@@ -105,7 +105,7 @@ git_workflow:
 
              （proposal.md をもとにした概要）
 
-             Closes #<issue>   ← Issue番号がある場合のみ記載
+             Closes #<N>   ← Issue番号がある場合のみ記載
 
              ## 主な変更内容
 
