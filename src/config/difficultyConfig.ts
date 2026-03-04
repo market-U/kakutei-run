@@ -20,7 +20,7 @@ export interface DifficultyEntry {
 export const difficulties: DifficultyEntry[] = [
   {
     id: "easy",
-    displayName: "Easy",
+    displayName: "LV1 医療費控除",
     receiptCount: 10,
     stoneFrequency: 0.8,
     witchFrequency: 0.2,
@@ -29,7 +29,7 @@ export const difficulties: DifficultyEntry[] = [
   },
   {
     id: "normal",
-    displayName: "Normal",
+    displayName: "LV2 白色申告",
     receiptCount: 15,
     stoneFrequency: 1.5,
     witchFrequency: 0.5,
@@ -38,7 +38,7 @@ export const difficulties: DifficultyEntry[] = [
   },
   {
     id: "hard",
-    displayName: "Hard",
+    displayName: "LV3 青色申告",
     receiptCount: 25,
     stoneFrequency: 2.5,
     witchFrequency: 1,
