@@ -39,6 +39,11 @@ When ready to implement, run /opsx:apply
    ```
    This creates a scaffolded change at `openspec/changes/<name>/` with `.openspec.yaml`.
 
+2b. **Execute git workflow**
+   - `openspec/config.yaml` の `git_workflow.rules` を読み込む
+   - trigger `"openspec-explore / openspec-propose (changeディレクトリ作成時)"` のルールを**必ず実行**する
+   - これにはブランチの作成・チェックアウト・change ディレクトリのコミットが含まれる
+
 3. **Get the artifact build order**
    ```bash
    openspec status --change "<name>" --json
