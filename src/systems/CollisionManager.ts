@@ -36,7 +36,6 @@ export class CollisionManager {
       if (rectsOverlap(pb, stone.getHitBounds())) {
         stone.consume();
         this.player.triggerFall();
-        this.enemy.startChasing();
         this.scene.events.emit("stoneHit");
         return;
       }
