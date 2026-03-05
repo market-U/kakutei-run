@@ -86,31 +86,24 @@ git_workflow:
         2. フィーチャーブランチをリモートへプッシュする
            - `git push -u origin <branch>` （ブランチ名は naming.branch のルールで決定済みのもの）
         3. GitHub CLI (`gh pr create`) で develop ブランチへの PR を作成する
-           - **必ずヒアドキュメント + stdin（`--body-file -`）を使うこと。`--body` に文字列を直接渡すと zsh のグロブ展開で失敗する。**
+           - **`printf ... | gh pr create --body-file -` を使うこと。**
+             - `--body` への直接文字列渡し → zsh グロブ展開でエラー
+             - ヒアドキュメント `<< 'EOF'` → ツールがハング
+             - `printf` パイプ → 即座に出力して終了するためハングしない ✅
            - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する
            - Issue番号がある場合: 事前に以下でIssueのラベルを取得し、`--label` に渡す
              ```sh
              labels=$(gh issue view <N> --json labels --jq '[.labels[].name] | join(",")' 2>/dev/null)
              ```
              `$labels` が空でない場合は `--label "$labels"` を追加する（空の場合は省略）
-           - コマンド形式:
+           - コマンド形式（`\n` で改行、パイプで stdin に渡す）:
              ```sh
-             gh pr create \
-               --base develop \
-               --title "タイトル" \
-               --label "$labels" \
-               --body-file - << 'EOF'
-             ## 概要
-
-             （proposal.md をもとにした概要）
-
-             Closes #<N>   ← Issue番号がある場合のみ記載
-
-             ## 主な変更内容
-
-             - ...
-             EOF
+             printf '## 概要\n\n（概要テキスト）\n\nCloses #<N>\n\n## 主な変更内容\n\n- 変更1\n- 変更2\n' \
+               | gh pr create \
+                 --base develop \
+                 --title "タイトル" \
+                 --label "$labels" \
+                 --body-file -
              ```
            - Issue番号がない場合は `Closes #...` 行を省略する
-           - `/tmp` などへの中間ファイル書き出しは禁止（古い内容が混入する原因になる）
         4. 作成した PR の URL をユーザーへ伝える
