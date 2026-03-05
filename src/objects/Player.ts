@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { AssetKeys, FrameCount } from "../assets/AssetKeys";
 import { gameConfig } from "../config/gameConfig";
-import { calcJumpVelocity, calcChargeScale } from "../systems/gameUtils";
+import { calcJumpVelocity, calcChargeScaleY, calcChargeScaleX } from "../systems/gameUtils";
 import type { DifficultyEntry } from "../config/difficultyConfig";
 import { calcWitchSlowDuration } from "../config/gameConfig";
 import { PlayerStateManager } from "./PlayerStateManager";
@@ -311,10 +311,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (spaceJustDown) this.startCharge();
     if (spaceJustUp) this.releaseJump();
 
-    // チャージ量に連動して Y 方向にスプライトを縮小（下端起点）
+    // チャージ量に連動して Y 方向に縮小・X 方向に拡大（Y: 下端起点、X: 中央起点）
     const chargeAmount = this.getChargeAmount();
     if (chargeAmount > 0) {
-      this.setScale(1, calcChargeScale(chargeAmount));
+      this.setScale(calcChargeScaleX(chargeAmount), calcChargeScaleY(chargeAmount));
     } else {
       this.setScale(1, 1);
     }

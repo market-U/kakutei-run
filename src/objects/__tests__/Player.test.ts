@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { calcJumpVelocity, calcChargeScale } from "../../systems/gameUtils";
+import { calcJumpVelocity, calcChargeScaleY } from "../../systems/gameUtils";
 import { gameConfig } from "../../config/gameConfig";
 import { PlayerStateManager } from "../PlayerStateManager";
 
@@ -31,25 +31,25 @@ describe("calcJumpVelocity", () => {
 /**
  * Player スプライト Y スケール縮小（ジャンプチャージ演出）
  *
- * 実装: Player.update() 内で calcChargeScale(chargeAmount) を用いて scaleY を設定。
+ * 実装: Player.update() 内で calcChargeScaleY(chargeAmount) を用いて scaleY を設定。
  * ジャンプ発動時（releaseJump）は anims.stop() と setScale(1,1) を呼び出してリセット。
  * これらの Phaser オブジェクト依存の呼び出しは統合テスト・手動テストで確認する。
  */
-describe("calcChargeScale（Playerチャージ縮小演出のスケール計算）", () => {
+describe("calcChargeScaleY（Playerチャージ縮小演出のスケール計算）", () => {
   it("チャージなし（0）のとき scaleY は 1.0", () => {
-    expect(calcChargeScale(0)).toBeCloseTo(1.0);
+    expect(calcChargeScaleY(0)).toBeCloseTo(1.0);
   });
 
-  it("チャージ最大（1.0）のとき scaleY は 0.7", () => {
-    expect(calcChargeScale(1)).toBeCloseTo(0.7);
+  it("チャージ最大（1.0）のとき scaleY は 0.8", () => {
+    expect(calcChargeScaleY(1)).toBeCloseTo(0.8);
   });
 
-  it("チャージ中間（0.5）のとき scaleY は 0.85", () => {
-    expect(calcChargeScale(0.5)).toBeCloseTo(0.85);
+  it("チャージ中間（0.5）のとき scaleY は 0.9", () => {
+    expect(calcChargeScaleY(0.5)).toBeCloseTo(0.9);
   });
 
-  it("チャージが範囲外（>1）でも scaleY は 0.7 にクランプされる", () => {
-    expect(calcChargeScale(1.5)).toBeCloseTo(0.7);
+  it("チャージが範囲外（>1）でも scaleY は 0.8 にクランプされる", () => {
+    expect(calcChargeScaleY(1.5)).toBeCloseTo(0.8);
   });
 });
 
