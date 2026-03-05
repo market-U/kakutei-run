@@ -91,6 +91,9 @@ git_workflow:
              - ヒアドキュメント `<< 'EOF'` → ツールがハング
              - `printf` パイプ → 即座に出力して終了するためハングしない ✅
            - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する
+             - **`--title` に `→` `（` `）` などの Unicode 特殊記号を使わないこと。**
+               zsh のクォートパーサーが混乱してコマンドがハングする原因になる。
+               矢印は `->` や「から」、括弧は半角 `()` に置き換えること。
            - Issue番号がある場合: 事前に以下でIssueのラベルを取得し、`--label` に渡す
              ```sh
              labels=$(gh issue view <N> --json labels --jq '[.labels[].name] | join(",")' 2>/dev/null)
