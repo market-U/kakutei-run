@@ -150,9 +150,10 @@ export class GameScene extends Phaser.Scene {
     this.totalReceipts = this.receipts.length;
 
     // --- ゴール（税務署） ---
+    const TAX_OFFICE_OFFSET_Y = 0; // 地面からのオフセット
     const goalWorldX = this.difficulty.stageLength + 200;
     const goalImg = this.add
-      .image(goalWorldX, SCREEN_GROUND_Y, AssetKeys.TAX_OFFICE)
+      .image(goalWorldX, SCREEN_GROUND_Y - TAX_OFFICE_OFFSET_Y, AssetKeys.TAX_OFFICE)
       .setOrigin(0.5, 1)
       .setDepth(5);
     this.taxOffice = { worldX: goalWorldX, img: goalImg };
