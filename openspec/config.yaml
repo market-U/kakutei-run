@@ -85,35 +85,52 @@ git_workflow:
            - **注意**: `git add` のみでは mv による削除が追跡されない。必ず `git rm -r` で元ディレクトリを明示的に削除すること。
         2. フィーチャーブランチをリモートへプッシュする
            - `git push -u origin <branch>` （ブランチ名は naming.branch のルールで決定済みのもの）
-        3. GitHub CLI (`gh pr create`) で develop ブランチへの PR を作成する
-           - **`printf ... | gh pr create --body-file -` を使うこと。**
-             - `--body` への直接文字列渡し → zsh グロブ展開でエラー
-             - ヒアドキュメント `<< 'EOF'` → ツールがハング
-             - `printf` パイプ → 即座に出力して終了するためハングしない ✅
-           - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する
-             - **`--title` に `→` `（` `）` などの Unicode 特殊記号を使わないこと。**
-               zsh のクォートパーサーが混乱してコマンドがハングする原因になる。
-               矢印は `->` や「から」、括弧は半角 `()` に置き換えること。
-           - Issue番号がある場合: 事前に以下でIssueのラベルを取得し、`--label` に渡す
+        3. `gh api` で develop ブランチへの PR を作成する
+           - `gh pr create` は zsh でのグロブ展開・Unicode・ヒアドキュメントのハングが起きやすいため、
+             `gh api` + `jq` による JSON 生成方式を使うこと。
+           - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する（Unicode 特殊記号は問題ない）
+           - **手順**:
+             ```sh
+             # 1. リポジトリの nameWithOwner を取得
+             repo=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
+
+             # 2. PR ボディを変数に格納（printf で改行を含む文字列として確保）
+             pr_body=$(printf '## 概要\n\n（概要テキスト）\n\nCloses #<N>\n\n## 主な変更内容\n\n- 変更1\n- 変更2\n')
+             # Issue番号がない場合は Closes #... 行を省略する
+
+             # 3. jq で JSON を安全に生成（日本語・改行・特殊文字を自動エスケープ）
+             tmpfile=$(mktemp)
+             jq -n \
+               --arg title "タイトル" \
+               --arg body "$pr_body" \
+               --arg head "<branch>" \
+               --arg base "develop" \
+               '{title: $title, body: $body, head: $head, base: $base}' > "$tmpfile"
+
+             # 4. PR 作成
+             result=$(gh api "repos/$repo/pulls" --input "$tmpfile")
+             pr_url=$(echo "$result" | jq -r '.html_url')
+             pr_number=$(echo "$result" | jq -r '.number')
+             rm "$tmpfile"
+
+             echo "PR 作成: $pr_url"
+             ```
+           - Issue番号がある場合: ラベルを取得し PR 番号経由で設定する
              ```sh
              labels=$(gh issue view <N> --json labels --jq '[.labels[].name] | join(",")' 2>/dev/null)
+             if [ -n "$labels" ]; then
+               IFS=',' read -rA label_array <<< "$labels"
+               for label in "${label_array[@]}"; do
+                 gh api "repos/$repo/issues/$pr_number/labels" \
+                   --method POST -f "labels[]=$label"
+               done
+             fi
              ```
-             `$labels` が空でない場合は `--label "$labels"` を追加する（空の場合は省略）
-           - コマンド形式（`\n` で改行、パイプで stdin に渡す）:
-             ```sh
-             printf '## 概要\n\n（概要テキスト）\n\nCloses #<N>\n\n## 主な変更内容\n\n- 変更1\n- 変更2\n' \
-               | gh pr create \
-                 --base develop \
-                 --title "タイトル" \
-                 --label "$labels" \
-                 --body-file -
-             ```
-           - Issue番号がない場合は `Closes #...` 行を省略する
-           - **PR 作成後、または出力が文字化け・不明瞭だった場合は、必ず以下で結果を確認すること。**
+           - **PR 作成後、または結果が不明瞭だった場合は、必ず以下で確認すること。**
              再試行する前にこの確認を行わないと、PR が二重に作成されるリスクがある。
              ```sh
              gh pr list --head <branch>
              ```
              PR が既に存在すれば URL が表示されるのでそれをユーザーへ伝える。
-             存在しない場合のみ `gh pr create` を再実行する。
+             存在しない場合のみ再実行する。
         4. 作成した PR の URL をユーザーへ伝える
