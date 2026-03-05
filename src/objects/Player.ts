@@ -141,7 +141,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private startCharge(): void {
     if (this.ps.gameOver) return;
     if (this.jumpDisabled) return;
-    if (!this.ps.grounded) return; // 空中では受け付けない
+    if (!this.ps.grounded) {
+      this.ps.onPressInAir(); // 空中入力は着地時チャージのバッファとして登録
+      return;
+    }
     if (this.chargeStartTime !== null) return;
     this.chargeStartTime = this.scene.time.now;
   }
@@ -150,9 +153,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (this.ps.gameOver) return;
     if (this.jumpDisabled) {
       this.chargeStartTime = null;
+      this.ps.onReleaseInAir();
       return;
     }
-    if (this.chargeStartTime === null) return;
+    if (this.chargeStartTime === null) {
+      // 空中でリリースした場合はバッファをキャンセル
+      this.ps.onReleaseInAir();
+      return;
+    }
     if (!this.ps.grounded) {
       this.chargeStartTime = null;
       return;
@@ -194,6 +202,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const action = this.ps.onLanded();
     if (action === "none") return;
     this.chargeStartTime = null;
+    // 空中入力のバッファがあれば着地時刻にチャージ開始
+    const shouldCharge = this.ps.consumePendingCharge();
+    if (shouldCharge && !this.jumpDisabled) {
+      this.chargeStartTime = this.scene.time.now;
+    }
     this.playAnim(action === "play_back_pain" ? "back_pain" : "run");
   }
 

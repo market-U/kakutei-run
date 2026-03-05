@@ -204,6 +204,67 @@ describe("PlayerStateManager: triggerGoal (タスク 9.10)", () => {
   });
 });
 
+describe("PlayerStateManager: ジャンプ入力バッファリング", () => {
+  it("2.1: 空中プレス → 着地 → consumePendingCharge() が true を返す", () => {
+    const ps = new PlayerStateManager();
+    // grounded=false（デフォルト＝空中）でプレス
+    ps.onPressInAir();
+    expect(ps.pendingChargeOnLand).toBe(true);
+    // 着地
+    ps.onLanded();
+    // consumePendingCharge はフラグを消費して true を返す
+    expect(ps.consumePendingCharge()).toBe(true);
+    // 消費後は false
+    expect(ps.pendingChargeOnLand).toBe(false);
+  });
+
+  it("2.2: 空中プレス → 空中リリース → 着地 → consumePendingCharge() が false を返す", () => {
+    const ps = new PlayerStateManager();
+    ps.onPressInAir();
+    expect(ps.pendingChargeOnLand).toBe(true);
+    ps.onReleaseInAir(); // キャンセル
+    expect(ps.pendingChargeOnLand).toBe(false);
+    ps.onLanded();
+    expect(ps.consumePendingCharge()).toBe(false);
+  });
+
+  it("2.3: 空中プレス → triggerFall() → consumePendingCharge() が false を返す", () => {
+    const ps = new PlayerStateManager();
+    ps.onPressInAir();
+    expect(ps.pendingChargeOnLand).toBe(true);
+    ps.triggerFall();
+    expect(ps.consumePendingCharge()).toBe(false);
+  });
+
+  it("2.4: 地上（grounded=true）での onPressInAir() はバッファを立てない", () => {
+    const ps = new PlayerStateManager();
+    ps._setGrounded(true);
+    ps.onPressInAir();
+    expect(ps.pendingChargeOnLand).toBe(false);
+  });
+
+  it("gameOver 中の onPressInAir() はバッファを立てない", () => {
+    const ps = new PlayerStateManager();
+    ps._setGameOver(true);
+    ps.onPressInAir();
+    expect(ps.pendingChargeOnLand).toBe(false);
+  });
+
+  it("triggerGoal() はバッファをクリアする", () => {
+    const ps = new PlayerStateManager();
+    ps.onPressInAir(); // バッファセット
+    ps.triggerGoal();
+    expect(ps.pendingChargeOnLand).toBe(false);
+  });
+
+  it("triggerEnemyCaught() はバッファをクリアする", () => {
+    const ps = new PlayerStateManager();
+    ps.onPressInAir(); // バッファセット
+    ps.triggerEnemyCaught();
+    expect(ps.pendingChargeOnLand).toBe(false);
+  });
+});
+
 describe("PlayerStateManager: 状態遷移の組み合わせシナリオ", () => {
   it("S1→S3→S1: ジャンプ→着地でグラウンド状態が正しく復元される", () => {
     const ps = new PlayerStateManager();
