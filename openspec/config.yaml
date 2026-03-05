@@ -60,11 +60,10 @@ git_workflow:
              - "Bug" ラベルなし: `feature/issue-<N>-<name>`
            - Issue番号がない場合: `feature/<name>`
         4. 決定したブランチ名で `git checkout -b <branch>` を実行する
-        4. ブランチ作成後、change ディレクトリの内容をコミットする
+        5. ブランチ作成後、change ディレクトリの内容をコミットする
            - `git add openspec/changes/<change-dir>/`
            - `git commit -m "chore: <change-dir> の change を作成"`
-        5. 作成したブランチ名をユーザーへ伝える
-    - trigger: "openspec-apply-change (Task N 完了時)"
+        6. 作成したブランチ名をユーザーへ伝える
     - trigger: "openspec-apply-change (Task N 完了時)"
       description: |
         tasks.md の ## Task N（大項目）が完了したタイミングで実装コミットを行うこと。
@@ -86,32 +85,56 @@ git_workflow:
            - **注意**: `git add` のみでは mv による削除が追跡されない。必ず `git rm -r` で元ディレクトリを明示的に削除すること。
         2. フィーチャーブランチをリモートへプッシュする
            - `git push -u origin <branch>` （ブランチ名は naming.branch のルールで決定済みのもの）
-        3. GitHub CLI (`gh pr create`) で develop ブランチへの PR を作成する
-           - **必ずヒアドキュメント + stdin（`--body-file -`）を使うこと。`--body` に文字列を直接渡すと zsh のグロブ展開で失敗する。**
-           - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する
-           - Issue番号がある場合: 事前に以下でIssueのラベルを取得し、`--label` に渡す
+        3. `gh api` で develop ブランチへの PR を作成する
+           - `gh pr create` は zsh でのグロブ展開・Unicode・ヒアドキュメントのハングが起きやすいため、
+             **Python の `json.dump` で JSON ファイルを生成し `gh api --input` で渡す**方式を使うこと。
+             zsh のヒアドキュメント・グロブ展開を完全に迂回できる。
+           - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する（Unicode 特殊記号は問題ない）
+           - **手順**:
+             ```sh
+             # 1. リポジトリの nameWithOwner を取得
+             repo=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
+
+             # 2. PR タイトルとボディを変数に格納
+             pr_title="タイトル"
+             pr_body=$(printf '## 概要\n\n（概要テキスト）\n\nCloses #<N>\n\n## 主な変更内容\n\n- 変更1\n- 変更2\n')
+             # Issue番号がない場合は Closes #... 行を省略する
+
+             # 3. Python で JSON を安全に生成（日本語・改行・特殊文字を自動エスケープ）
+             #    タイトル・ボディ・ブランチ名を引数で渡すことで zsh のグロブ展開を回避する
+             tmpfile=$(mktemp /tmp/pr_payload_XXXXXX.json)
+             python3 -c "
+             import json, sys
+             with open(sys.argv[1], 'w', encoding='utf-8') as f:
+                 json.dump({'title': sys.argv[2], 'body': sys.argv[3], 'head': sys.argv[4], 'base': 'develop'}, f, ensure_ascii=False)
+             " "$tmpfile" "$pr_title" "$pr_body" "<branch>"
+
+             # 4. PR 作成
+             result=$(gh api "repos/$repo/pulls" --input "$tmpfile")
+             pr_url=$(echo "$result" | jq -r '.html_url')
+             pr_number=$(echo "$result" | jq -r '.number')
+
+             # 5. 一時ファイルを削除
+             rm "$tmpfile"
+
+             echo "PR 作成: $pr_url"
+             ```
+           - Issue番号がある場合: ラベルを取得し PR 番号経由で設定する
              ```sh
              labels=$(gh issue view <N> --json labels --jq '[.labels[].name] | join(",")' 2>/dev/null)
+             if [ -n "$labels" ]; then
+               IFS=',' read -rA label_array <<< "$labels"
+               for label in "${label_array[@]}"; do
+                 gh api "repos/$repo/issues/$pr_number/labels" \
+                   --method POST -f "labels[]=$label"
+               done
+             fi
              ```
-             `$labels` が空でない場合は `--label "$labels"` を追加する（空の場合は省略）
-           - コマンド形式:
+           - **PR 作成後、または結果が不明瞭だった場合は、必ず以下で確認すること。**
+             再試行する前にこの確認を行わないと、PR が二重に作成されるリスクがある。
              ```sh
-             gh pr create \
-               --base develop \
-               --title "タイトル" \
-               --label "$labels" \
-               --body-file - << 'EOF'
-             ## 概要
-
-             （proposal.md をもとにした概要）
-
-             Closes #<N>   ← Issue番号がある場合のみ記載
-
-             ## 主な変更内容
-
-             - ...
-             EOF
+             gh pr list --head <branch>
              ```
-           - Issue番号がない場合は `Closes #...` 行を省略する
-           - `/tmp` などへの中間ファイル書き出しは禁止（古い内容が混入する原因になる）
+             PR が既に存在すれば URL が表示されるのでそれをユーザーへ伝える。
+             存在しない場合のみ再実行する。
         4. 作成した PR の URL をユーザーへ伝える

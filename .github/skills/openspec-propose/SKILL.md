@@ -39,6 +39,11 @@ When ready to implement, run /opsx:apply
    ```
    This creates a scaffolded change at `openspec/changes/<name>/` with `.openspec.yaml`.
 
+2b. **Execute git workflow**
+   - `openspec/config.yaml` の `git_workflow.rules` を読み込む
+   - trigger `"openspec-explore / openspec-propose (changeディレクトリ作成時)"` のルールを**必ず実行**する
+   - これにはブランチの作成・チェックアウト・change ディレクトリのコミットが含まれる
+
 3. **Get the artifact build order**
    ```bash
    openspec status --change "<name>" --json
@@ -69,6 +74,14 @@ When ready to implement, run /opsx:apply
       - Create the artifact file using `template` as the structure
       - Apply `context` and `rules` as constraints - but do NOT copy them into the file
       - Show brief progress: "Created <artifact-id>"
+
+   a-2. **After creating `proposal` artifact, pause for user review**
+      - proposal.md が生成されたら、次のアーティファクトへ進む前に必ず一時停止すること
+      - proposal.md の内容を要約してユーザーに提示する
+      - **AskUserQuestion tool** を使って確認を求める:
+        > "proposal.md を作成しました。内容を確認してください。このまま design・tasks の作成に進みますか？修正があればお知らせください。"
+      - ユーザーから修正指示があった場合は proposal.md を更新してから再度確認する
+      - ユーザーが承認したら次のアーティファクトへ進む
 
    b. **Continue until all `applyRequires` artifacts are complete**
       - After creating each artifact, re-run `openspec status --change "<name>" --json`

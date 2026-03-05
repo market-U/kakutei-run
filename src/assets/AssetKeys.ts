@@ -28,7 +28,7 @@ export const FrameSize = {
   /** プレーヤー共通フレームサイズ (px) */
   PLAYER: { width: 64, height: 96 },
   /** 敵キャラフレームサイズ (px) */
-  ENEMY: { width: 64, height: 96 },
+  ENEMY: { width: 96, height: 144 },
   /** 魔女フレームサイズ (px) */
   WITCH: { width: 64, height: 64 },
 } as const;

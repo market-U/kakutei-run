@@ -41,6 +41,7 @@ interface TaxOfficeObj {
 type GameState =
   | "playing"
   | "back_pain_slow"
+  | "stone_fall_coasting"
   | "stone_fall"
   | "cleared"
   | "game_over";
@@ -68,6 +69,9 @@ export class GameScene extends Phaser.Scene {
 
   // 腰痛スロー時の速度
   private slowedScrollSpeed = 0;
+
+  // 腰痛スロータイマー（石ころ被弾時にキャンセルするために保持）
+  private backPainTimer: Phaser.Time.TimerEvent | null = null;
 
   constructor() {
     super({ key: "GameScene" });
@@ -146,9 +150,10 @@ export class GameScene extends Phaser.Scene {
     this.totalReceipts = this.receipts.length;
 
     // --- ゴール（税務署） ---
+    const TAX_OFFICE_OFFSET_Y = 0; // 地面からのオフセット
     const goalWorldX = this.difficulty.stageLength + 200;
     const goalImg = this.add
-      .image(goalWorldX, SCREEN_GROUND_Y, AssetKeys.TAX_OFFICE)
+      .image(goalWorldX, SCREEN_GROUND_Y - TAX_OFFICE_OFFSET_Y, AssetKeys.TAX_OFFICE)
       .setOrigin(0.5, 1)
       .setDepth(5);
     this.taxOffice = { worldX: goalWorldX, img: goalImg };
@@ -200,6 +205,26 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    // セーフネット: 状態遷移の考慮漏れ等でスクロールが異常に継続した場合に強制終了する
+    if (this.scrolledX > this.difficulty.stageLength + 500) {
+      this.onScrollOverrun();
+      return;
+    }
+
+    // 転倒アニメーション再生中: スクロール継続、敵は待機
+    if (this.state === "stone_fall_coasting") {
+      const speed = this.scrollManager.getSpeed();
+      const dx = (speed * delta) / 1000;
+      this.scrolledX += dx;
+      this.scrollManager.update(delta);
+      for (const s of this.stones) s.updateScroll(this.scrolledX);
+      for (const w of this.witches) w.updateScroll(this.scrolledX, speed, delta);
+      for (const r of this.receipts) r.updateScroll(this.scrolledX, speed, delta);
+      this.taxOffice.img.x = this.taxOffice.worldX - this.scrolledX;
+      this.collision.checkEnemyReached();
+      return;
+    }
+
     // スクロール
     const speed = this.scrollManager.getSpeed();
     const dx = (speed * delta) / 1000;
@@ -243,10 +268,24 @@ export class GameScene extends Phaser.Scene {
   // イベントハンドラ
   // -------------------------------------------------
   private onStoneHit(): void {
-    if (this.state !== "playing") return;
-    this.state = "stone_fall";
-    this.scrollManager.stop();
+    if (this.state !== "playing" && this.state !== "back_pain_slow") return;
+    // 腰痛スロータイマーが残っていればキャンセルする
+    if (this.backPainTimer) {
+      this.backPainTimer.remove(false);
+      this.backPainTimer = null;
+    }
+    this.state = "stone_fall_coasting";
     this.player.setJumpDisabled(true);
+
+    // fall アニメーション完了後にスクロール停止・敵追跡開始
+    this.player.once(
+      Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + "player_fall",
+      () => {
+        this.scrollManager.stop();
+        this.enemy.startChasing();
+        this.state = "stone_fall";
+      },
+    );
   }
 
   private onWitchHit(_hitCount: number): void {
@@ -261,7 +300,9 @@ export class GameScene extends Phaser.Scene {
     this.scrollManager.setSpeed(this.slowedScrollSpeed);
     this.enemy.applyWitchHit(slowDuration);
 
-    this.time.delayedCall(slowDuration * 1000, () => {
+    // タイマーを保持して石ころ被弾時にキャンセルできるようにする
+    this.backPainTimer = this.time.delayedCall(slowDuration * 1000, () => {
+      this.backPainTimer = null;
       if (this.state === "back_pain_slow") {
         this.state = "playing";
         this.scrollManager.setSpeed(this.baseScrollSpeed);
@@ -280,6 +321,21 @@ export class GameScene extends Phaser.Scene {
     this.scrollManager.stop();
     this.enemy.stopChasing();
     this.player.triggerEnemyCaught();
+    this.time.delayedCall(2000, () => {
+      this.scene.start("ResultScene", {
+        result: "gameover",
+        collected: this.collectedCount,
+        total: this.totalReceipts,
+        difficultyId: this.difficulty.id,
+      });
+    });
+  }
+
+  private onScrollOverrun(): void {
+    if (this.state === "game_over" || this.state === "cleared") return;
+    this.state = "game_over";
+    this.scrollManager.stop();
+    this.enemy.stopChasing();
     this.time.delayedCall(2000, () => {
       this.scene.start("ResultScene", {
         result: "gameover",

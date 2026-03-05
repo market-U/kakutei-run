@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { AssetKeys, FrameCount } from "../assets/AssetKeys";
 import { gameConfig } from "../config/gameConfig";
-import { calcJumpVelocity, calcChargeScale } from "../systems/gameUtils";
+import { calcJumpVelocity, calcChargeScaleY, calcChargeScaleX } from "../systems/gameUtils";
 import type { DifficultyEntry } from "../config/difficultyConfig";
 import { calcWitchSlowDuration } from "../config/gameConfig";
 import { PlayerStateManager } from "./PlayerStateManager";
@@ -141,7 +141,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private startCharge(): void {
     if (this.ps.gameOver) return;
     if (this.jumpDisabled) return;
-    if (!this.ps.grounded) return; // 空中では受け付けない
+    if (!this.ps.grounded) {
+      this.ps.onPressInAir(); // 空中入力は着地時チャージのバッファとして登録
+      return;
+    }
     if (this.chargeStartTime !== null) return;
     this.chargeStartTime = this.scene.time.now;
   }
@@ -150,9 +153,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (this.ps.gameOver) return;
     if (this.jumpDisabled) {
       this.chargeStartTime = null;
+      this.ps.onReleaseInAir();
       return;
     }
-    if (this.chargeStartTime === null) return;
+    if (this.chargeStartTime === null) {
+      // 空中でリリースした場合はバッファをキャンセル
+      this.ps.onReleaseInAir();
+      return;
+    }
     if (!this.ps.grounded) {
       this.chargeStartTime = null;
       return;
@@ -194,6 +202,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const action = this.ps.onLanded();
     if (action === "none") return;
     this.chargeStartTime = null;
+    // 空中入力のバッファがあれば着地時刻にチャージ開始
+    const shouldCharge = this.ps.consumePendingCharge();
+    if (shouldCharge && !this.jumpDisabled) {
+      this.chargeStartTime = this.scene.time.now;
+    }
     this.playAnim(action === "play_back_pain" ? "back_pain" : "run");
   }
 
@@ -311,10 +324,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (spaceJustDown) this.startCharge();
     if (spaceJustUp) this.releaseJump();
 
-    // チャージ量に連動して Y 方向にスプライトを縮小（下端起点）
+    // チャージ量に連動して Y 方向に縮小・X 方向に拡大（Y: 下端起点、X: 中央起点）
     const chargeAmount = this.getChargeAmount();
     if (chargeAmount > 0) {
-      this.setScale(1, calcChargeScale(chargeAmount));
+      this.setScale(calcChargeScaleX(chargeAmount), calcChargeScaleY(chargeAmount));
     } else {
       this.setScale(1, 1);
     }

@@ -286,3 +286,7 @@ But this summary is optional. Sometimes the thinking IS the value.
 - **Do visualize** - A good diagram is worth many paragraphs
 - **Do explore the codebase** - Ground discussions in reality
 - **Do question assumptions** - Including the user's and your own
+
+## Git Workflow
+
+`openspec new change "<name>"` で change ディレクトリを作成した直後は、`openspec/config.yaml` の `git_workflow.rules` を読み込み、trigger `"openspec-explore / openspec-propose (changeディレクトリ作成時)"` のルールを**必ず実行**すること。これにはブランチの作成・チェックアウト・change ディレクトリのコミットが含まれる。

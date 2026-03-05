@@ -13,6 +13,8 @@ export class Witch extends Phaser.GameObjects.Sprite {
 
   /** 地面スクロール速度係数 */
   private speedFactor: number;
+  /** 速度係数による累積移動量 (px) */
+  private extraScrolledX = 0;
   /** 既にヒット済みか */
   private _consumed = false;
 
@@ -56,9 +58,9 @@ export class Witch extends Phaser.GameObjects.Sprite {
    * @param delta フレーム経過時間 (ms)
    */
   updateScroll(scrolledX: number, scrollSpeed: number, delta: number): void {
-    // 魔女固有の追加移動量（独自速度係数分の差分）
-    const extraDx = (scrollSpeed * (this.speedFactor - 1.0) * delta) / 1000;
-    this.x = this.worldX - scrolledX - extraDx;
+    // 速度係数による差分を累積する（時間経過とともに地面スクロールとのずれが広がる）
+    this.extraScrolledX += (scrollSpeed * (this.speedFactor - 1.0) * delta) / 1000;
+    this.x = this.worldX - scrolledX - this.extraScrolledX;
   }
 
   isVisible(): boolean {

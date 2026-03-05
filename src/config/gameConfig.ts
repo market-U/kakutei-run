@@ -31,9 +31,9 @@ export const gameConfig = {
 
   // ---- 魔女 出現・移動 ----
   /** 魔女のスクロール速度係数 最小値 */
-  witchScrollSpeedFactorMin: 0.8,
+  witchScrollSpeedFactorMin: 1.2,
   /** 魔女のスクロール速度係数 最大値 */
-  witchScrollSpeedFactorMax: 1.2,
+  witchScrollSpeedFactorMax: 1.8,
   /** 魔女の出現 Y 座標 最小値 (px, 上端が0) */
   witchYMin: 180,
   /** 魔女の出現 Y 座標 最大値 (px) */
@@ -41,9 +41,9 @@ export const gameConfig = {
 
   // ---- レシート 出現・移動 ----
   /** レシートのスクロール速度係数 最小値 */
-  receiptSpeedFactorMin: 0.8,
+  receiptSpeedFactorMin: 0.9,
   /** レシートのスクロール速度係数 最大値 */
-  receiptSpeedFactorMax: 1.2,
+  receiptSpeedFactorMax: 1.1,
   /** レシートの出現 Y 座標 最小値 (px) */
   receiptYMin: 100,
   /** レシートの出現 Y 座標 最大値 (px) */

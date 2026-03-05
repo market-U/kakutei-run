@@ -15,6 +15,8 @@ export class Receipt extends Phaser.GameObjects.Image {
 
   /** 地面スクロール速度係数 */
   private speedFactor: number;
+  /** 速度係数による累積移動量 (px) */
+  private extraScrolledX = 0;
   /** 収集済みか */
   private _collected = false;
 
@@ -36,8 +38,9 @@ export class Receipt extends Phaser.GameObjects.Image {
   }
 
   updateScroll(scrolledX: number, scrollSpeed: number, delta: number): void {
-    const extraDx = (scrollSpeed * (this.speedFactor - 1.0) * delta) / 1000;
-    this.x = this.worldX - scrolledX - extraDx;
+    // 速度係数による差分を累積する（時間経過とともに地面スクロールとのずれが広がる）
+    this.extraScrolledX += (scrollSpeed * (this.speedFactor - 1.0) * delta) / 1000;
+    this.x = this.worldX - scrolledX - this.extraScrolledX;
   }
 
   isVisible(): boolean {

@@ -26,11 +26,22 @@ export function calcReceiptScore(collected: number, total: number): number {
 
 /**
  * チャージ量からプレーヤースプライトの Y 方向スケールを計算する純粋関数
- * チャージ 0% のとき scaleY = 1.0、チャージ 100% のとき scaleY = 0.7
+ * チャージ 0% のとき scaleY = 1.0、チャージ 100% のとき scaleY = 0.8
  * @param chargeAmount 0.0〜1.0 のチャージ量
- * @returns scaleY 値 (0.7〜1.0)
+ * @returns scaleY 値 (0.8〜1.0)
  */
-export function calcChargeScale(chargeAmount: number): number {
+export function calcChargeScaleY(chargeAmount: number): number {
   const c = Math.min(Math.max(chargeAmount, 0), 1);
-  return 1.0 - 0.3 * c;
+  return 1.0 - 0.2 * c;
+}
+
+/**
+ * チャージ量からプレーヤースプライトの X 方向スケールを計算する純粋関数
+ * チャージ 0% のとき scaleX = 1.0、チャージ 100% のとき scaleX = 1.2
+ * @param chargeAmount 0.0〜1.0 のチャージ量
+ * @returns scaleX 値 (1.0〜1.2)
+ */
+export function calcChargeScaleX(chargeAmount: number): number {
+  const c = Math.min(Math.max(chargeAmount, 0), 1);
+  return 1.0 + 0.2 * c;
 }

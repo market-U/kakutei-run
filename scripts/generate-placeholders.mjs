@@ -148,7 +148,7 @@ saveSpritesheet("player_run.png", 64, 96, 6, [80, 160, 240, 255]); // 青
 saveSpritesheet("player_fall.png", 64, 96, 5, [80, 160, 240, 255]);
 saveSpritesheet("player_goal.png", 64, 96, 5, [80, 160, 240, 255]);
 saveSpritesheet("player_back_pain.png", 64, 96, 6, [100, 140, 200, 255]);
-saveSpritesheet("enemy_run.png", 64, 96, 6, [220, 80, 80, 255]); // 赤
+saveSpritesheet("enemy_run.png", 96, 144, 6, [220, 80, 80, 255]); // 赤
 saveSpritesheet("witch_float.png", 64, 64, 4, [180, 80, 220, 255]); // 紫
 
 // Static images
