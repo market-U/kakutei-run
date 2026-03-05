@@ -29,6 +29,7 @@ export class PlayerStateManager {
   private _isBackPain = false;
   private _falling = false;
   private _gameOver = false;
+  private _pendingChargeOnLand = false;
 
   // -------------------------------------------------
   // ゲッター
@@ -45,10 +46,39 @@ export class PlayerStateManager {
   get gameOver(): boolean {
     return this._gameOver;
   }
+  get pendingChargeOnLand(): boolean {
+    return this._pendingChargeOnLand;
+  }
 
   // -------------------------------------------------
   // 状態遷移
   // -------------------------------------------------
+
+  /**
+   * 空中でのボタン押下（バッファ登録）
+   * 空中かつゲーム中の場合に pendingChargeOnLand フラグを立てる。
+   */
+  onPressInAir(): void {
+    if (this._grounded || this._gameOver || this._falling) return;
+    this._pendingChargeOnLand = true;
+  }
+
+  /**
+   * 空中でのボタンリリース（バッファキャンセル）
+   */
+  onReleaseInAir(): void {
+    this._pendingChargeOnLand = false;
+  }
+
+  /**
+   * 着地時チャージバッファの消費
+   * フラグを読んで即 false にリセットし、元の値を返す。
+   */
+  consumePendingCharge(): boolean {
+    const pending = this._pendingChargeOnLand;
+    this._pendingChargeOnLand = false;
+    return pending;
+  }
 
   /**
    * ジャンプ発動（S1→S3 / S2→S4）
@@ -77,6 +107,7 @@ export class PlayerStateManager {
   triggerFall(): AnimAction {
     if (this._gameOver || this._falling) return "none";
     this._falling = true;
+    this._pendingChargeOnLand = false;
     return "reset_scale_and_play_fall";
   }
 
@@ -87,6 +118,7 @@ export class PlayerStateManager {
   triggerGoal(): AnimAction {
     if (this._gameOver) return "none";
     this._gameOver = true;
+    this._pendingChargeOnLand = false;
     return "reset_scale_and_play_goal";
   }
 
@@ -98,6 +130,7 @@ export class PlayerStateManager {
   triggerEnemyCaught(): AnimAction {
     if (this._gameOver) return "none";
     this._gameOver = true;
+    this._pendingChargeOnLand = false;
     if (!this._falling) {
       // scaleをリセットしてアニメーションを停止（現在フレームで固定）
       return "reset_scale_and_stop";
@@ -147,5 +180,8 @@ export class PlayerStateManager {
   }
   _setBackPain(v: boolean): void {
     this._isBackPain = v;
+  }
+  _setPendingChargeOnLand(v: boolean): void {
+    this._pendingChargeOnLand = v;
   }
 }
