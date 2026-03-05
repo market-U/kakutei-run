@@ -87,30 +87,34 @@ git_workflow:
            - `git push -u origin <branch>` （ブランチ名は naming.branch のルールで決定済みのもの）
         3. `gh api` で develop ブランチへの PR を作成する
            - `gh pr create` は zsh でのグロブ展開・Unicode・ヒアドキュメントのハングが起きやすいため、
-             `gh api` + `jq` による JSON 生成方式を使うこと。
+             **Python の `json.dump` で JSON ファイルを生成し `gh api --input` で渡す**方式を使うこと。
+             zsh のヒアドキュメント・グロブ展開を完全に迂回できる。
            - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する（Unicode 特殊記号は問題ない）
            - **手順**:
              ```sh
              # 1. リポジトリの nameWithOwner を取得
              repo=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
 
-             # 2. PR ボディを変数に格納（printf で改行を含む文字列として確保）
+             # 2. PR タイトルとボディを変数に格納
+             pr_title="タイトル"
              pr_body=$(printf '## 概要\n\n（概要テキスト）\n\nCloses #<N>\n\n## 主な変更内容\n\n- 変更1\n- 変更2\n')
              # Issue番号がない場合は Closes #... 行を省略する
 
-             # 3. jq で JSON を安全に生成（日本語・改行・特殊文字を自動エスケープ）
-             tmpfile=$(mktemp)
-             jq -n \
-               --arg title "タイトル" \
-               --arg body "$pr_body" \
-               --arg head "<branch>" \
-               --arg base "develop" \
-               '{title: $title, body: $body, head: $head, base: $base}' > "$tmpfile"
+             # 3. Python で JSON を安全に生成（日本語・改行・特殊文字を自動エスケープ）
+             #    タイトル・ボディ・ブランチ名を引数で渡すことで zsh のグロブ展開を回避する
+             tmpfile=$(mktemp /tmp/pr_payload_XXXXXX.json)
+             python3 -c "
+             import json, sys
+             with open(sys.argv[1], 'w', encoding='utf-8') as f:
+                 json.dump({'title': sys.argv[2], 'body': sys.argv[3], 'head': sys.argv[4], 'base': 'develop'}, f, ensure_ascii=False)
+             " "$tmpfile" "$pr_title" "$pr_body" "<branch>"
 
              # 4. PR 作成
              result=$(gh api "repos/$repo/pulls" --input "$tmpfile")
              pr_url=$(echo "$result" | jq -r '.html_url')
              pr_number=$(echo "$result" | jq -r '.number')
+
+             # 5. 一時ファイルを削除
              rm "$tmpfile"
 
              echo "PR 作成: $pr_url"
