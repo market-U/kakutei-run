@@ -29,16 +29,16 @@ describe("calcChargeScale", () => {
     expect(calcChargeScale(0)).toBeCloseTo(1.0);
   });
 
-  it("チャージ1のとき scaleY は 0.7", () => {
-    expect(calcChargeScale(1)).toBeCloseTo(0.7);
+  it("チャージ1のとき scaleY は 0.8", () => {
+    expect(calcChargeScale(1)).toBeCloseTo(0.8);
   });
 
-  it("チャージ0.5のとき scaleY は 0.85", () => {
-    expect(calcChargeScale(0.5)).toBeCloseTo(0.85);
+  it("チャージ0.5のとき scaleY は 0.9", () => {
+    expect(calcChargeScale(0.5)).toBeCloseTo(0.9);
   });
 
-  it("チャージが1を超えても 0.7 にクランプされる", () => {
-    expect(calcChargeScale(2)).toBeCloseTo(0.7);
+  it("チャージが1を超えても 0.8 にクランプされる", () => {
+    expect(calcChargeScale(2)).toBeCloseTo(0.8);
   });
 
   it("チャージが負の値でも 1.0 にクランプされる", () => {
