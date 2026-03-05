@@ -30,7 +30,7 @@ export function calcReceiptScore(collected: number, total: number): number {
  * @param chargeAmount 0.0〜1.0 のチャージ量
  * @returns scaleY 値 (0.8〜1.0)
  */
-export function calcChargeScale(chargeAmount: number): number {
+export function calcChargeScaleY(chargeAmount: number): number {
   const c = Math.min(Math.max(chargeAmount, 0), 1);
   return 1.0 - 0.2 * c;
 }
