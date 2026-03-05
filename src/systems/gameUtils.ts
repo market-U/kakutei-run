@@ -34,3 +34,14 @@ export function calcChargeScale(chargeAmount: number): number {
   const c = Math.min(Math.max(chargeAmount, 0), 1);
   return 1.0 - 0.3 * c;
 }
+
+/**
+ * チャージ量からプレーヤースプライトの X 方向スケールを計算する純粋関数
+ * チャージ 0% のとき scaleX = 1.0、チャージ 100% のとき scaleX = 1.2
+ * @param chargeAmount 0.0〜1.0 のチャージ量
+ * @returns scaleX 値 (1.0〜1.2)
+ */
+export function calcChargeScaleX(chargeAmount: number): number {
+  const c = Math.min(Math.max(chargeAmount, 0), 1);
+  return 1.0 + 0.2 * c;
+}

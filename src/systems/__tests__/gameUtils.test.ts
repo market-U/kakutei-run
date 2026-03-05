@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { calcReceiptScore, calcChargeScale } from "../gameUtils";
+import { calcReceiptScore, calcChargeScale, calcChargeScaleX } from "../gameUtils";
 
 describe("calcReceiptScore", () => {
   it("全枚数収集した場合は 100 を返す", () => {
@@ -43,5 +43,27 @@ describe("calcChargeScale", () => {
 
   it("チャージが負の値でも 1.0 にクランプされる", () => {
     expect(calcChargeScale(-0.5)).toBeCloseTo(1.0);
+  });
+});
+
+describe("calcChargeScaleX", () => {
+  it("チャージ0のとき scaleX は 1.0", () => {
+    expect(calcChargeScaleX(0)).toBeCloseTo(1.0);
+  });
+
+  it("チャージ1のとき scaleX は 1.2", () => {
+    expect(calcChargeScaleX(1)).toBeCloseTo(1.2);
+  });
+
+  it("チャージ0.5のとき scaleX は 1.1", () => {
+    expect(calcChargeScaleX(0.5)).toBeCloseTo(1.1);
+  });
+
+  it("チャージが1を超えても 1.2 にクランプされる", () => {
+    expect(calcChargeScaleX(2)).toBeCloseTo(1.2);
+  });
+
+  it("チャージが負の値でも 1.0 にクランプされる", () => {
+    expect(calcChargeScaleX(-0.5)).toBeCloseTo(1.0);
   });
 });
