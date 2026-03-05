@@ -70,6 +70,9 @@ export class GameScene extends Phaser.Scene {
   // 腰痛スロー時の速度
   private slowedScrollSpeed = 0;
 
+  // 腰痛スロータイマー（石ころ被弾時にキャンセルするために保持）
+  private backPainTimer: Phaser.Time.TimerEvent | null = null;
+
   constructor() {
     super({ key: "GameScene" });
   }
@@ -201,6 +204,12 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    // セーフネット: 状態遷移の考慮漏れ等でスクロールが異常に継続した場合に強制終了する
+    if (this.scrolledX > this.difficulty.stageLength + 500) {
+      this.onScrollOverrun();
+      return;
+    }
+
     // 転倒アニメーション再生中: スクロール継続、敵は待機
     if (this.state === "stone_fall_coasting") {
       const speed = this.scrollManager.getSpeed();
@@ -258,7 +267,12 @@ export class GameScene extends Phaser.Scene {
   // イベントハンドラ
   // -------------------------------------------------
   private onStoneHit(): void {
-    if (this.state !== "playing") return;
+    if (this.state !== "playing" && this.state !== "back_pain_slow") return;
+    // 腰痛スロータイマーが残っていればキャンセルする
+    if (this.backPainTimer) {
+      this.backPainTimer.remove(false);
+      this.backPainTimer = null;
+    }
     this.state = "stone_fall_coasting";
     this.player.setJumpDisabled(true);
 
@@ -285,7 +299,9 @@ export class GameScene extends Phaser.Scene {
     this.scrollManager.setSpeed(this.slowedScrollSpeed);
     this.enemy.applyWitchHit(slowDuration);
 
-    this.time.delayedCall(slowDuration * 1000, () => {
+    // タイマーを保持して石ころ被弾時にキャンセルできるようにする
+    this.backPainTimer = this.time.delayedCall(slowDuration * 1000, () => {
+      this.backPainTimer = null;
       if (this.state === "back_pain_slow") {
         this.state = "playing";
         this.scrollManager.setSpeed(this.baseScrollSpeed);
@@ -304,6 +320,21 @@ export class GameScene extends Phaser.Scene {
     this.scrollManager.stop();
     this.enemy.stopChasing();
     this.player.triggerEnemyCaught();
+    this.time.delayedCall(2000, () => {
+      this.scene.start("ResultScene", {
+        result: "gameover",
+        collected: this.collectedCount,
+        total: this.totalReceipts,
+        difficultyId: this.difficulty.id,
+      });
+    });
+  }
+
+  private onScrollOverrun(): void {
+    if (this.state === "game_over" || this.state === "cleared") return;
+    this.state = "game_over";
+    this.scrollManager.stop();
+    this.enemy.stopChasing();
     this.time.delayedCall(2000, () => {
       this.scene.start("ResultScene", {
         result: "gameover",
