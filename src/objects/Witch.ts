@@ -15,6 +15,8 @@ export class Witch extends Phaser.GameObjects.Sprite {
   private speedFactor: number;
   /** 速度係数による累積移動量 (px) */
   private extraScrolledX = 0;
+  /** 画面にフレームインしたか */
+  private _hasFramedIn = false;
   /** 既にヒット済みか */
   private _consumed = false;
 
@@ -58,9 +60,17 @@ export class Witch extends Phaser.GameObjects.Sprite {
    * @param delta フレーム経過時間 (ms)
    */
   updateScroll(scrolledX: number, scrollSpeed: number, delta: number): void {
-    // 速度係数による差分を累積する（時間経過とともに地面スクロールとのずれが広がる）
+    const baseX = this.worldX - scrolledX;
+    if (!this._hasFramedIn) {
+      this.x = baseX;
+      if (this.isVisible()) {
+        this._hasFramedIn = true;
+      }
+      return;
+    }
+    // フレームイン後のみ速度係数による差分を累積する
     this.extraScrolledX += (scrollSpeed * (this.speedFactor - 1.0) * delta) / 1000;
-    this.x = this.worldX - scrolledX - this.extraScrolledX;
+    this.x = baseX - this.extraScrolledX;
   }
 
   isVisible(): boolean {

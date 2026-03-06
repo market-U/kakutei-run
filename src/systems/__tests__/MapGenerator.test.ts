@@ -47,12 +47,12 @@ describe("MapGenerator", () => {
     }
   });
 
-  it("すべてのオブジェクトはステージ範囲内に配置される", () => {
+  it("すべてのオブジェクトはゴール（stageLength）から600px以上離れて配置される", () => {
     const gen = new MapGenerator(normalDiff);
     const placed = gen.generate();
     for (const obj of placed) {
       expect(obj.worldX).toBeGreaterThanOrEqual(0);
-      expect(obj.worldX).toBeLessThanOrEqual(normalDiff.stageLength);
+      expect(obj.worldX).toBeLessThanOrEqual(normalDiff.stageLength - 600);
     }
   });
 });
