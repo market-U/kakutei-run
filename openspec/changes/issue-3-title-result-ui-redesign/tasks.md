@@ -2,11 +2,11 @@
 
 ## Task 1. Tailwind CSS + DaisyUI のセットアップ
 
-- [ ] 1.1 `tailwindcss`, `@tailwindcss/vite`, `daisyui` を devDependencies にインストールする
-- [ ] 1.2 `vite.config.ts` に `@tailwindcss/vite` プラグインを追加し、`__APP_VERSION__` の define を追加する
-- [ ] 1.3 `src/style.css` を新規作成し `@import "tailwindcss"`・`@plugin "daisyui"`・`font-family: 'DotGothic16'` を記述する
-- [ ] 1.4 `index.html` の `<head>` に Google Fonts（DotGothic16）の `<link>` と `<link rel="stylesheet" href="/src/style.css">` を追加する
-- [ ] 1.5 ビルド・開発サーバーで Tailwind クラスが適用されることを確認する
+- [x] 1.1 `tailwindcss`, `@tailwindcss/vite`, `daisyui` を devDependencies にインストールする
+- [x] 1.2 `vite.config.ts` に `@tailwindcss/vite` プラグインを追加し、`__APP_VERSION__` の define を追加する
+- [x] 1.3 `src/style.css` を新規作成し `@import "tailwindcss"`・`@plugin "daisyui"`・`font-family: 'DotGothic16'` を記述する
+- [x] 1.4 `index.html` の `<head>` に Google Fonts（DotGothic16）の `<link>` と `<link rel="stylesheet" href="/src/style.css">` を追加する
+- [x] 1.5 ビルド・開発サーバーで Tailwind クラスが適用されることを確認する
 
 ## Task 2. タイトルロゴプレースホルダーの追加
 
