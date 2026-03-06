@@ -19,8 +19,12 @@
         justify-content: center;
         align-items: center;
         width: 100vw;
-        height: 100vh;
+        height: 100svh;
         overflow: hidden;
+      }
+      #game-container {
+        width: 100%;
+        height: 100%;
       }
       #game-container canvas {
         touch-action: none;
@@ -200,30 +204,11 @@
         background: #555;
       }
 
-      /* ===== 向き切り替えボタン（常時表示） ===== */
-      #orientation-toggle {
-        position: fixed;
-        top: 8px;
-        right: 8px;
-        width: 40px;
-        height: 40px;
-        background: rgba(0, 0, 0, 0.5);
-        color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
-        font-size: 20px;
-        cursor: pointer;
-        z-index: 200;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
       /* ===== ポーズボタン（ゲームプレイ中のみ表示） ===== */
       #pause-btn {
         position: fixed;
         top: 8px;
-        right: 56px;
+        right: 8px;
         width: 40px;
         height: 40px;
         background: rgba(0, 0, 0, 0.5);
@@ -296,9 +281,6 @@
       <p class="retry-label">難易度を選んでリトライ</p>
       <div id="retry-buttons"></div>
     </div>
-
-    <!-- 向き切り替えボタン（常時表示） -->
-    <button id="orientation-toggle" title="画面回転">⟳</button>
 
     <!-- ポーズボタン（ゲームプレイ中のみ表示） -->
     <button id="pause-btn" title="ポーズ">⏸</button>

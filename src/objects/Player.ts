@@ -106,19 +106,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   // -------------------------------------------------
   // 入力セットアップ
   // -------------------------------------------------
-  setupInput(
-    keyboard: Phaser.Input.Keyboard.KeyboardPlugin,
-    input: Phaser.Input.InputPlugin,
-  ): void {
+  setupInput(keyboard: Phaser.Input.Keyboard.KeyboardPlugin): void {
     this.keySpace = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
-    // タッチ / マウスポインター
-    input.on("pointerdown", () => {
-      this.startCharge();
-    });
-    input.on("pointerup", () => {
-      this.releaseJump();
-    });
   }
 
   setInitialEnemyDistance(distance: number): void {
@@ -138,7 +127,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   // -------------------------------------------------
   // ジャンプ
   // -------------------------------------------------
-  private startCharge(): void {
+  startCharge(): void {
     if (this.ps.gameOver) return;
     if (this.jumpDisabled) return;
     if (!this.ps.grounded) {
@@ -149,7 +138,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.chargeStartTime = this.scene.time.now;
   }
 
-  private releaseJump(): void {
+  releaseJump(): void {
     if (this.ps.gameOver) return;
     if (this.jumpDisabled) {
       this.chargeStartTime = null;

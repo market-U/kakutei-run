@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { AssetKeys, FrameSize, FrameCount } from "../assets/AssetKeys";
-import { CANVAS_W, CANVAS_H } from "../config/canvasConfig";
+import { CANVAS_W } from "../config/canvasConfig";
 
 /** アセット読み込みとローディング進捗表示を担当するシーン */
 export class BootScene extends Phaser.Scene {
@@ -25,7 +25,7 @@ export class BootScene extends Phaser.Scene {
     const barW = 500;
     const barH = 24;
     const barX = (CANVAS_W - barW) / 2;
-    const barY = CANVAS_H / 2;
+    const barY = this.scale.height / 2;
 
     // 背景
     const bg = this.add.graphics();

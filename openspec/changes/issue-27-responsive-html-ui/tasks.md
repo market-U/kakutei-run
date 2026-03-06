@@ -6,7 +6,7 @@
 - [x] 1.2 `index.html` に縦横レイアウト切り替え用の CSS を追加する（`body.portrait` / `body.landscape` クラスによるキャンバスの表示切り替え）
 - [x] 1.3 `index.html` にタイトル画面 HTML 構造（`<div id="title-screen">`）を追加する
 - [x] 1.4 `index.html` にリザルト画面 HTML 構造（`<div id="result-screen">`）を追加する
-- [x] 1.5 `index.html` に手動切り替えボタン（`<button id="orientation-toggle">`）を追加し、常時表示される CSS を設定する
+- [x] 1.5 ~~`index.html` に手動切り替えボタン（`<button id="orientation-toggle">`）を追加~~ → 追加後に削除（Scale.FIT で十分なため不要と判断）
 - [x] 1.6 `index.html` にポーズボタン（`<button id="pause-btn">`）を追加し、ゲームプレイ中のみ表示される CSS を設定する
 - [x] 1.7 `index.html` にポーズオーバーレイ（`<div id="pause-overlay">`）を追加し、タップで解除できる CSS・構造を設定する
 
@@ -48,10 +48,10 @@
 - [x] 7.1 `src/systems/OrientationManager.ts` を新規作成する
 - [x] 7.2 `screen.orientation.addEventListener('change')` による向き検知と、非対応環境向け `window.orientationchange` フォールバックを実装する
 - [x] 7.3 向き変化時に `body` の CSS クラス（`portrait` / `landscape`）を更新する処理を実装する
-- [x] 7.4 向き変化時に Phaser カメラのビューポートを切り替える処理を実装する（縦: フルキャンバス / 横: `setViewport(0, 0, 960, 540)` + `scrollY = 360`）
+- [x] 7.4 ~~向き変化時に Phaser カメラのビューポートを切り替える処理を実装する~~ → 不採用。Phaser キャンバスを 960×540 固定にしたため不要
 - [x] 7.5 向き変化時に `kakutei:orientationChanged` イベントを発火する処理を実装する
-- [x] 7.6 手動切り替えボタン（`#orientation-toggle`）のクリックイベントを `OrientationManager.ts` に登録する
-- [x] 7.7 `main.ts` で `OrientationManager` を初期化し、Phaser の `game` インスタンスを渡す
+- [x] 7.6 ~~手動切り替えボタン（`#orientation-toggle`）のクリックイベントを `OrientationManager.ts` に登録する~~ → 削除（ボタン自体を廃止）
+- [x] 7.7 ~~`main.ts` で `OrientationManager` を初期化し、Phaser の `game` インスタンスを渡す~~ → game インスタンスは不要。引数なしで初期化
 
 ## 8. Phaser 設定のクリーンアップ
 
@@ -63,3 +63,11 @@
 
 - [x] 9.1 `README.md` のアーキテクチャ説明を更新し、HTML UI 層と Phaser ゲーム層の構成・カスタムイベント通信を記述する
 - [x] 9.2 `README.md` の画面構成・ファイル構成の記述を最新化する（TitleScene・ResultScene の廃止と新ファイルの追加を反映する）
+
+## 10. 設計変更後の追加実装
+
+- [x] 10.1 `index.html` の `body` を `height: 100vh` から `height: 100svh` に変更し、モバイルブラウザの実表示エリアへの適合を改善する
+- [x] 10.2 `Player.ts` の `setupInput()` から `input.on('pointerdown/up')` を削除し、`startCharge()`・`releaseJump()` を `public` に変更する
+- [x] 10.3 `GameScene.ts` に `document.addEventListener('pointerdown/up')` を追加し、全画面タッチジャンプを実現する（ボタン・`#pause-overlay` へのタップは除外）
+- [x] 10.4 `GameScene.ts` の SHUTDOWN 時に `document.removeEventListener` でリスナーを解除する
+- [x] 10.5 `index.html` の `#pause-btn` の位置を `right: 56px` から `right: 8px` に修正する（`#orientation-toggle` 削除に伴う調整）

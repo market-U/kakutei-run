@@ -33,7 +33,7 @@ const game = new Phaser.Game(config);
 // HTML UI 層の初期化
 new TitleUI();
 new ResultUI();
-new OrientationManager(game);
+new OrientationManager();
 
 // タイトルからゲーム開始
 window.addEventListener("kakutei:startGame", (e) => {

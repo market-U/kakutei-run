@@ -81,6 +81,8 @@ export class GameScene extends Phaser.Scene {
   private onOrientationChanged!: () => void;
   private onPauseBtnClick!: () => void;
   private onPauseOverlayClick!: () => void;
+  private onDocumentPointerDown!: (e: PointerEvent) => void;
+  private onDocumentPointerUp!: () => void;
 
   constructor() {
     super({ key: "GameScene" });
@@ -125,7 +127,7 @@ export class GameScene extends Phaser.Scene {
       this.difficulty,
     );
     this.player.setInitialEnemyDistance(INITIAL_ENEMY_DISTANCE);
-    this.player.setupInput(this.input.keyboard!, this.input);
+    this.player.setupInput(this.input.keyboard!);
 
     // プレーヤーと地面の Arcade collider (着地判定)
     this.physics.add.collider(this.player, groundLine, () => {
@@ -194,6 +196,18 @@ export class GameScene extends Phaser.Scene {
       this.onBackPainStart(data.slowDuration);
     });
 
+    // --- 全画面タッチジャンプ（document レベルで受け取る） ---
+    this.onDocumentPointerDown = (e: PointerEvent) => {
+      // ボタン・ポーズオーバーレイへのタップは無視
+      if ((e.target as Element).closest("button, #pause-overlay")) return;
+      this.player.startCharge();
+    };
+    this.onDocumentPointerUp = () => {
+      this.player.releaseJump();
+    };
+    document.addEventListener("pointerdown", this.onDocumentPointerDown);
+    document.addEventListener("pointerup", this.onDocumentPointerUp);
+
     // --- ポーズ関連の window イベントリスナー ---
     this.onPauseBtnClick = () => this.pause();
     this.onOrientationChanged = () => this.pause();
@@ -223,6 +237,8 @@ export class GameScene extends Phaser.Scene {
       document
         .getElementById("pause-overlay")
         ?.removeEventListener("click", this.onPauseOverlayClick);
+      document.removeEventListener("pointerdown", this.onDocumentPointerDown);
+      document.removeEventListener("pointerup", this.onDocumentPointerUp);
     });
   }
 
