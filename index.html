@@ -23,9 +23,9 @@
 
     <!-- タイトル画面 -->
     <div id="title-screen" class="hidden fixed inset-0 bg-sky-400 z-[100] overflow-y-auto">
-      <div class="min-h-full flex flex-col landscape:flex-row items-center justify-center gap-6 px-6 py-8 landscape:py-4 landscape:gap-0">
+      <div class="flex flex-col landscape:flex-row items-center justify-center gap-6 px-6 py-8 landscape:py-4 landscape:gap-0 min-h-full w-full">
         <!-- 左カラム：ロゴエリア -->
-        <div class="flex flex-col items-center gap-3 landscape:flex-1 landscape:justify-center">
+        <div class="flex flex-col items-center justify-center gap-3 landscape:flex-1">
           <img
             id="title-logo"
             src="/assets/ui/title_logo.png"
@@ -34,29 +34,29 @@
           />
         </div>
         <!-- 右カラム：操作エリア -->
-        <div class="flex flex-col items-center gap-4 landscape:flex-1 landscape:justify-center">
-          <p class="text-white text-base">難易度を選んでスタート！</p>
+        <div class="flex flex-col items-center justify-center gap-4 landscape:flex-1">
+          <p class="text-white text-base text-center">難易度を選んでスタート！</p>
           <div id="difficulty-buttons" class="flex flex-col gap-3 items-center w-full max-w-xs"></div>
           <span id="title-hint" class="text-sm text-white/70 text-center">スペース or タップ: ジャンプ（長押しでチャージ）</span>
-          <span id="app-version" class="text-xs text-white/50"></span>
+          <span id="app-version" class="text-xs text-white/50 text-center"></span>
         </div>
       </div>
     </div>
 
     <!-- リザルト画面 -->
     <div id="result-screen" class="hidden fixed inset-0 bg-black/85 z-[100] overflow-y-auto">
-      <div class="min-h-full flex flex-col landscape:flex-row items-center justify-center gap-5 px-6 py-8 landscape:py-4 landscape:gap-0">
+      <div class="flex flex-col landscape:flex-row items-center justify-center gap-5 px-6 py-8 landscape:py-4 landscape:gap-0 min-h-full w-full">
         <!-- 左カラム：結果エリア -->
-        <div class="flex flex-col items-center gap-3 landscape:flex-1 landscape:justify-center">
-          <div id="result-title" class="text-5xl [text-shadow:2px_2px_6px_#000]"></div>
-          <div id="result-score" class="text-2xl text-white"></div>
-          <div id="result-count" class="text-lg text-white/70"></div>
-          <div id="result-difficulty" class="hidden text-base text-white/60"></div>
+        <div class="flex flex-col items-center justify-center gap-3 landscape:flex-1">
+          <div id="result-title" class="text-5xl text-center [text-shadow:2px_2px_6px_#000]"></div>
+          <div id="result-score" class="text-2xl text-white text-center"></div>
+          <div id="result-count" class="text-lg text-white/70 text-center"></div>
+          <div id="result-difficulty" class="hidden text-base text-white/60 text-center"></div>
           <button id="share-btn" class="btn bg-sky-500 hover:bg-sky-400 text-white border-none mt-2">📱 シェア</button>
         </div>
         <!-- 右カラム：リトライエリア -->
-        <div class="flex flex-col items-center gap-3 landscape:flex-1 landscape:justify-center">
-          <p class="text-white/70 text-base">難易度を選んでリトライ</p>
+        <div class="flex flex-col items-center justify-center gap-3 landscape:flex-1">
+          <p class="text-white/70 text-base text-center">難易度を選んでリトライ</p>
           <div id="retry-buttons" class="flex flex-col gap-3 items-center w-full max-w-xs"></div>
         </div>
       </div>
