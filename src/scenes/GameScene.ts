@@ -44,7 +44,8 @@ type GameState =
   | "stone_fall_coasting"
   | "stone_fall"
   | "cleared"
-  | "game_over";
+  | "game_over"
+  | "paused";
 
 export class GameScene extends Phaser.Scene {
   private difficulty!: DifficultyEntry;
@@ -72,6 +73,16 @@ export class GameScene extends Phaser.Scene {
 
   // 腰痛スロータイマー（石ころ被弾時にキャンセルするために保持）
   private backPainTimer: Phaser.Time.TimerEvent | null = null;
+
+  // ポーズ前の状態（再開時に復元）
+  private stateBeforePause: GameState = "playing";
+
+  // window イベントのクリーンアップ用参照
+  private onOrientationChanged!: () => void;
+  private onPauseBtnClick!: () => void;
+  private onPauseOverlayClick!: () => void;
+  private onDocumentPointerDown!: (e: PointerEvent) => void;
+  private onDocumentPointerUp!: () => void;
 
   constructor() {
     super({ key: "GameScene" });
@@ -116,7 +127,7 @@ export class GameScene extends Phaser.Scene {
       this.difficulty,
     );
     this.player.setInitialEnemyDistance(INITIAL_ENEMY_DISTANCE);
-    this.player.setupInput(this.input.keyboard!, this.input);
+    this.player.setupInput(this.input.keyboard!);
 
     // プレーヤーと地面の Arcade collider (着地判定)
     this.physics.add.collider(this.player, groundLine, () => {
@@ -185,16 +196,55 @@ export class GameScene extends Phaser.Scene {
       this.onBackPainStart(data.slowDuration);
     });
 
+    // --- 全画面タッチジャンプ（document レベルで受け取る） ---
+    this.onDocumentPointerDown = (e: PointerEvent) => {
+      // ボタン・ポーズオーバーレイへのタップは無視
+      if ((e.target as Element).closest("button, #pause-overlay")) return;
+      this.player.startCharge();
+    };
+    this.onDocumentPointerUp = () => {
+      this.player.releaseJump();
+    };
+    document.addEventListener("pointerdown", this.onDocumentPointerDown);
+    document.addEventListener("pointerup", this.onDocumentPointerUp);
+
+    // --- ポーズ関連の window イベントリスナー ---
+    this.onPauseBtnClick = () => this.pause();
+    this.onOrientationChanged = () => this.pause();
+    this.onPauseOverlayClick = () => this.resume();
+
+    document
+      .getElementById("pause-btn")!
+      .addEventListener("click", this.onPauseBtnClick);
+    window.addEventListener("kakutei:orientationChanged", this.onOrientationChanged);
+    document
+      .getElementById("pause-overlay")!
+      .addEventListener("click", this.onPauseOverlayClick);
+
     // shutdown 時にリスナーを明示的にクリーンアップ
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.events.off("stoneHit", this.onStoneHit, this);
       this.events.off("witchHit", this.onWitchHit, this);
       this.events.off("receiptCollected", this.onReceiptCollected, this);
       this.events.off("enemyReached", this.onEnemyReached, this);
+      document
+        .getElementById("pause-btn")
+        ?.removeEventListener("click", this.onPauseBtnClick);
+      window.removeEventListener(
+        "kakutei:orientationChanged",
+        this.onOrientationChanged,
+      );
+      document
+        .getElementById("pause-overlay")
+        ?.removeEventListener("click", this.onPauseOverlayClick);
+      document.removeEventListener("pointerdown", this.onDocumentPointerDown);
+      document.removeEventListener("pointerup", this.onDocumentPointerUp);
     });
   }
 
   update(_time: number, delta: number): void {
+    if (this.state === "paused") return;
+
     if (
       this.state === "stone_fall" ||
       this.state === "game_over" ||
@@ -322,12 +372,17 @@ export class GameScene extends Phaser.Scene {
     this.enemy.stopChasing();
     this.player.triggerEnemyCaught();
     this.time.delayedCall(2000, () => {
-      this.scene.start("ResultScene", {
-        result: "gameover",
-        collected: this.collectedCount,
-        total: this.totalReceipts,
-        difficultyId: this.difficulty.id,
-      });
+      this.hud.destroy();
+      window.dispatchEvent(
+        new CustomEvent("kakutei:gameResult", {
+          detail: {
+            result: "gameover",
+            collected: this.collectedCount,
+            total: this.totalReceipts,
+            difficultyId: this.difficulty.id,
+          },
+        }),
+      );
     });
   }
 
@@ -337,12 +392,17 @@ export class GameScene extends Phaser.Scene {
     this.scrollManager.stop();
     this.enemy.stopChasing();
     this.time.delayedCall(2000, () => {
-      this.scene.start("ResultScene", {
-        result: "gameover",
-        collected: this.collectedCount,
-        total: this.totalReceipts,
-        difficultyId: this.difficulty.id,
-      });
+      this.hud.destroy();
+      window.dispatchEvent(
+        new CustomEvent("kakutei:gameResult", {
+          detail: {
+            result: "gameover",
+            collected: this.collectedCount,
+            total: this.totalReceipts,
+            difficultyId: this.difficulty.id,
+          },
+        }),
+      );
     });
   }
 
@@ -354,13 +414,51 @@ export class GameScene extends Phaser.Scene {
     this.showClearEffect();
 
     this.time.delayedCall(3000, () => {
-      this.scene.start("ResultScene", {
-        result: "clear",
-        collected: this.collectedCount,
-        total: this.totalReceipts,
-        difficultyId: this.difficulty.id,
-      });
+      this.hud.destroy();
+      window.dispatchEvent(
+        new CustomEvent("kakutei:gameResult", {
+          detail: {
+            result: "clear",
+            collected: this.collectedCount,
+            total: this.totalReceipts,
+            difficultyId: this.difficulty.id,
+          },
+        }),
+      );
     });
+  }
+
+  // -------------------------------------------------
+  // ポーズ / 再開
+  // -------------------------------------------------
+  private pause(): void {
+    if (
+      this.state === "paused" ||
+      this.state === "game_over" ||
+      this.state === "cleared"
+    )
+      return;
+    this.stateBeforePause = this.state;
+    this.state = "paused";
+    this.scrollManager.stop();
+    document.getElementById("pause-overlay")!.classList.add("visible");
+  }
+
+  private resume(): void {
+    if (this.state !== "paused") return;
+    document.getElementById("pause-overlay")!.classList.remove("visible");
+    this.state = this.stateBeforePause;
+    if (
+      this.state === "playing" ||
+      this.state === "back_pain_slow" ||
+      this.state === "stone_fall_coasting"
+    ) {
+      const speed =
+        this.state === "back_pain_slow"
+          ? this.slowedScrollSpeed
+          : this.baseScrollSpeed;
+      this.scrollManager.setSpeed(speed);
+    }
   }
 
   // -------------------------------------------------

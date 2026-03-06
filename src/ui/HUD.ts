@@ -1,36 +1,20 @@
-import Phaser from "phaser";
-
-/** ゲームプレイ中のHUD表示（UI上部ゾーンに配置） */
+/** ゲームプレイ中のHUD表示（HTMLオーバーレイ要素を更新） */
 export class HUD {
-  private receiptText: Phaser.GameObjects.Text;
-  private distanceText: Phaser.GameObjects.Text;
+  private receiptsEl: HTMLElement;
+  private distanceEl: HTMLElement;
 
   private collectedCount = 0;
   private totalCount = 0;
   private distance = 0;
 
-  constructor(scene: Phaser.Scene, totalReceipts: number) {
+  constructor(_scene: unknown, totalReceipts: number) {
     this.totalCount = totalReceipts;
 
-    const style: Phaser.Types.GameObjects.Text.TextStyle = {
-      fontSize: "32px",
-      color: "#ffffff",
-      fontFamily: "sans-serif",
-      stroke: "#000000",
-      strokeThickness: 4,
-    };
+    this.receiptsEl = document.getElementById("hud-receipts")!;
+    this.distanceEl = document.getElementById("hud-distance")!;
 
-    // レシート収集数 — UI上部ゾーン内に配置
-    this.receiptText = scene.add
-      .text(40, 240, "", style)
-      .setScrollFactor(0)
-      .setDepth(20);
-
-    // 進行距離
-    this.distanceText = scene.add
-      .text(40, 290, "", style)
-      .setScrollFactor(0)
-      .setDepth(20);
+    document.getElementById("hud-overlay")!.classList.add("visible");
+    document.getElementById("pause-btn")!.classList.add("visible");
 
     this.refresh();
   }
@@ -45,10 +29,13 @@ export class HUD {
     this.refresh();
   }
 
+  destroy(): void {
+    document.getElementById("hud-overlay")!.classList.remove("visible");
+    document.getElementById("pause-btn")!.classList.remove("visible");
+  }
+
   private refresh(): void {
-    this.receiptText.setText(
-      `レシート: ${this.collectedCount} / ${this.totalCount}`,
-    );
-    this.distanceText.setText(`距離: ${Math.floor(this.distance)}m`);
+    this.receiptsEl.textContent = `レシート: ${this.collectedCount} / ${this.totalCount}`;
+    this.distanceEl.textContent = `距離: ${Math.floor(this.distance)}m`;
   }
 }
