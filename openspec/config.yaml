@@ -64,6 +64,14 @@ git_workflow:
            - `git add openspec/changes/<change-dir>/`
            - `git commit -m "chore: <change-dir> の change を作成"`
         6. 作成したブランチ名をユーザーへ伝える
+    - trigger: "openspec-apply-change (開始時)"
+      description: |
+        apply を開始する前に、change ディレクトリ内の未コミットファイルをすべてコミットすること。
+        1. `git status` で未コミットの変更を確認する
+        2. `openspec/changes/<change-dir>/` 配下に未コミットファイルがあれば以下を実行する
+           - `git add openspec/changes/<change-dir>/`
+           - `git commit -m "chore: <change-dir> の設計アーティファクトを追加"`
+        3. 未コミットファイルがなければスキップしてそのまま実装へ進む
     - trigger: "openspec-apply-change (Task N 完了時)"
       description: |
         tasks.md の ## Task N（大項目）が完了したタイミングで実装コミットを行うこと。
