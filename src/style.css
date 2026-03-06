@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+body {
+  font-family: "DotGothic16", sans-serif;
+}
+
+/* JS から classList.add("visible") で表示切り替えするための上書きルール */
+.visible {
+  display: flex !important;
+}
+
+#game-container canvas {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}

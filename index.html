@@ -7,288 +7,87 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
     <title>確定申告ラン</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        background: #000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100vw;
-        height: 100svh;
-        overflow: hidden;
-      }
-      #game-container {
-        width: 100%;
-        height: 100%;
-      }
-      #game-container canvas {
-        touch-action: none;
-        user-select: none;
-        -webkit-user-select: none;
-      }
-
-      /* ===== HUD オーバーレイ（ゲームプレイ中のみ表示） ===== */
-      #hud-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        padding: 10px 16px;
-        display: none;
-        justify-content: space-between;
-        align-items: center;
-        pointer-events: none;
-        z-index: 10;
-      }
-      #hud-overlay.visible {
-        display: flex;
-      }
-      #hud-receipts,
-      #hud-distance {
-        color: #fff;
-        font-size: 18px;
-        font-family: sans-serif;
-        text-shadow: 0 0 4px #000, 0 0 4px #000;
-      }
-
-      /* ===== タイトル画面 ===== */
-      #title-screen {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: #87ceeb;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-        z-index: 100;
-      }
-      #title-screen.visible {
-        display: flex;
-      }
-      #title-screen h1 {
-        font-size: 48px;
-        color: #fff;
-        font-family: sans-serif;
-        text-shadow: 2px 2px 4px #333;
-      }
-      #title-screen > p {
-        font-size: 20px;
-        color: #eee;
-        font-family: sans-serif;
-      }
-      #difficulty-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        align-items: center;
-      }
-      .difficulty-btn {
-        font-size: 24px;
-        font-family: sans-serif;
-        padding: 12px 48px;
-        background: #444;
-        color: #aaa;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background 0.15s;
-        min-width: 200px;
-      }
-      .difficulty-btn.selected {
-        background: #e09020;
-        color: #fff;
-      }
-      .difficulty-btn:hover:not(.selected) {
-        background: #555;
-      }
-      #start-btn {
-        font-size: 28px;
-        font-family: sans-serif;
-        padding: 14px 64px;
-        background: #e05020;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-top: 8px;
-        transition: background 0.15s;
-      }
-      #start-btn:hover {
-        background: #ff6030;
-      }
-      #title-hint {
-        font-size: 14px;
-        color: #aaa;
-        font-family: sans-serif;
-      }
-
-      /* ===== リザルト画面 ===== */
-      #result-screen {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.85);
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 16px;
-        z-index: 100;
-      }
-      #result-screen.visible {
-        display: flex;
-      }
-      #result-title {
-        font-size: 56px;
-        font-family: sans-serif;
-        text-shadow: 2px 2px 6px #000;
-      }
-      #result-score {
-        font-size: 32px;
-        color: #fff;
-        font-family: sans-serif;
-      }
-      #result-count {
-        font-size: 22px;
-        color: #bbb;
-        font-family: sans-serif;
-      }
-      #share-btn {
-        font-size: 22px;
-        font-family: sans-serif;
-        padding: 12px 40px;
-        background: #1da1f2;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-top: 8px;
-        transition: background 0.15s;
-      }
-      #share-btn:hover {
-        background: #1a8cd8;
-      }
-      .retry-label {
-        font-size: 20px;
-        color: #ccc;
-        font-family: sans-serif;
-      }
-      #retry-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        align-items: center;
-      }
-      .retry-btn {
-        font-size: 22px;
-        font-family: sans-serif;
-        padding: 10px 40px;
-        background: #444;
-        color: #aaa;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        min-width: 200px;
-        transition: background 0.15s;
-      }
-      .retry-btn.current {
-        background: #e09020;
-        color: #fff;
-      }
-      .retry-btn:hover:not(.current) {
-        background: #555;
-      }
-
-      /* ===== ポーズボタン（ゲームプレイ中のみ表示） ===== */
-      #pause-btn {
-        position: fixed;
-        top: 8px;
-        right: 8px;
-        width: 40px;
-        height: 40px;
-        background: rgba(0, 0, 0, 0.5);
-        color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
-        font-size: 18px;
-        cursor: pointer;
-        z-index: 200;
-        display: none;
-        align-items: center;
-        justify-content: center;
-      }
-      #pause-btn.visible {
-        display: flex;
-      }
-
-      /* ===== ポーズオーバーレイ ===== */
-      #pause-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.7);
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 16px;
-        z-index: 150;
-        cursor: pointer;
-      }
-      #pause-overlay.visible {
-        display: flex;
-      }
-      #pause-overlay p {
-        font-size: 48px;
-        color: #fff;
-        font-family: sans-serif;
-      }
-      #pause-overlay small {
-        font-size: 20px;
-        color: #aaa;
-        font-family: sans-serif;
-      }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
   </head>
-  <body class="portrait">
-    <div id="game-container"></div>
+  <body class="bg-black flex justify-center items-center w-screen h-svh overflow-hidden">
+    <div id="game-container" class="w-full h-full"></div>
 
     <!-- HUD オーバーレイ（ゲームプレイ中のみ表示） -->
-    <div id="hud-overlay">
-      <span id="hud-receipts">レシート: 0 / 0</span>
-      <span id="hud-distance">距離: 0m</span>
+    <div id="hud-overlay" class="hidden fixed top-0 left-0 right-0 px-4 py-2.5 justify-between items-center pointer-events-none z-10">
+      <span id="hud-receipts" class="text-white text-lg [text-shadow:0_0_4px_#000,0_0_4px_#000]">レシート: 0 / 0</span>
+      <span id="hud-distance" class="text-white text-lg [text-shadow:0_0_4px_#000,0_0_4px_#000]">距離: 0m</span>
     </div>
 
     <!-- タイトル画面 -->
-    <div id="title-screen">
-      <h1>確定申告ラン</h1>
-      <p>難易度を選択してください</p>
-      <div id="difficulty-buttons"></div>
-      <button id="start-btn">スタート</button>
-      <span id="title-hint">スペース or タップ: ジャンプ（長押しでチャージ）</span>
+    <div id="title-screen" class="hidden fixed inset-0 bg-yellow-100/100 z-[100] overflow-y-auto justify-center">
+      <div class="flex flex-row">
+        <div class="flex flex-col landscape:flex-row items-center justify-center gap-3 px-6 py-8 landscape:py-4 landscape:gap-2 min-h-full w-full">
+          <!-- 左カラム：ロゴエリア -->
+          <div class="flex flex-col items-center justify-center landscape:flex-4 min-w-[320px]">
+            <img
+              id="title-logo"
+              src="/assets/ui/title_logo.png"
+              alt="確定RUN"
+              class="max-w-[320px] w-full"
+            />
+            <span id="app-version" class="text-md text-black/100 text-right"></span>
+          </div>
+          <!-- 右カラム：操作エリア -->
+          <div class="flex flex-col items-center justify-center gap-4 landscape:flex-3 min-w-[240px]">
+            <p class="hidden text-black text-base text-center"><i class="fa-solid fa-arrow-down"></i>スタート</p>
+            <div id="difficulty-buttons" class="flex flex-col gap-3 items-center w-full max-w-xs"></div>
+            <!-- <span id="title-hint" class="text-sm text-white/70 text-center">スペース or タップ: ジャンプ（長押しでチャージ）</span> -->
+            <img
+              id="kakuko"
+              src="/assets/ui/kakuko.png"
+              alt="カクコさん"
+              class="max-w-[320px] w-full"
+            />
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- リザルト画面 -->
-    <div id="result-screen">
-      <div id="result-title"></div>
-      <div id="result-score"></div>
-      <div id="result-count"></div>
-      <button id="share-btn">📱 シェア</button>
-      <p class="retry-label">難易度を選んでリトライ</p>
-      <div id="retry-buttons"></div>
+    <div id="result-screen" class="hidden fixed inset-0 bg-zinc-700/85 z-[100] overflow-y-auto justify-center">
+      <div class="flex flex-row">
+        <div class="flex flex-col landscape:flex-row items-center justify-center gap-6 px-8 py-8 landscape:py-4 landscape:gap-2 min-h-full w-full">
+          <!-- 左カラム：結果エリア -->
+          <div class="flex flex-col items-center justify-center gap-3 landscape:flex-5 min-w-[320px]">
+            <div class="flex flex-col gap-0">
+              <div id="result-crown" class="hidden text-center"><i class="fa-solid fa-crown text-yellow-400/100"></i></div>
+              <div id="result-difficulty" class="text-2xl text-center [text-shadow:2px_2px_6px_#000]"></div>
+              <div id="result-title" class="text-5xl text-center [text-shadow:2px_2px_6px_#000]"></div>
+            </div>
+            <div id="result-score" class="text-2xl text-white text-center"></div>
+            <div id="result-count" class="hidden text-lg text-white/70 text-center"></div>
+            <button id="share-btn" class="btn bg-teal-400 hover:bg-teal-300 text-white border-none mt-2"><i class="fa-solid fa-share-nodes"></i>
+結果をシェア</button>
+          </div>
+          <!-- 右カラム：リトライエリア -->
+          <div class="flex flex-col items-center justify-center gap-4 landscape:flex-3 min-w-[240px]">
+            <p class="text-white/70 text-base text-center">リトライ</p>
+            <div id="retry-buttons" class="flex flex-col gap-3 items-center w-full max-w-xs"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ポーズボタン（ゲームプレイ中のみ表示） -->
-    <button id="pause-btn" title="ポーズ">⏸</button>
+    <button
+      id="pause-btn"
+      title="ポーズ"
+      class="hidden fixed top-2 right-2 w-10 h-10 bg-black/50 text-white border border-white/30 rounded-lg text-lg z-[200] items-center justify-center"
+    >⏸</button>
 
     <!-- ポーズオーバーレイ -->
-    <div id="pause-overlay">
-      <p>⏸ PAUSE</p>
-      <small>タップして再開</small>
+    <div id="pause-overlay" class="hidden fixed inset-0 bg-black/70 flex-col justify-center items-center gap-4 z-[150] cursor-pointer">
+      <p class="text-5xl text-white">⏸ PAUSE</p>
+      <small class="text-lg text-white/70">タップして再開</small>
     </div>
 
     <script type="module" src="/src/main.ts"></script>
