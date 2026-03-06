@@ -10,20 +10,20 @@
 
 ## Task 2. タイトルロゴプレースホルダーの追加
 
-- [ ] 2.1 `public/assets/ui/` ディレクトリを作成し、`title_logo.png`（ベタ塗り矩形のプレースホルダー PNG）を追加する
-- [ ] 2.2 `index.html` の `#title-screen` 内に `<img id="title-logo" src="/assets/ui/title_logo.png" alt="確定申告ラン">` を配置する
+- [x] 2.1 `public/assets/ui/` ディレクトリを作成し、`title_logo.png`（ベタ塗り矩形のプレースホルダー PNG）を追加する
+- [x] 2.2 `index.html` の `#title-screen` 内に `<img id="title-logo" src="/assets/ui/title_logo.png" alt="確定申告ラン">` を配置する
 
 ## Task 3. index.html のスタイル刷新（Tailwind クラスへ移行）
 
-- [ ] 3.1 `index.html` のインライン `<style>` タグを削除する
-- [ ] 3.2 `body` / `#game-container` のレイアウトクラスを Tailwind で記述する
-- [ ] 3.3 `#hud-overlay` を Tailwind クラスで再実装する
-- [ ] 3.4 `#title-screen` を縦画面は縦並び・横画面は2カラム（`landscape:flex-row`）のレイアウトで再実装する（ロゴ左・ボタン群右）
-- [ ] 3.5 `#result-screen` を縦画面は縦並び・横画面は2カラムのレイアウトで再実装する
-- [ ] 3.6 `#result-screen` に難易度表示用の空要素（`<div id="result-difficulty"></div>`）をあらかじめ配置する（非表示）
-- [ ] 3.7 `#pause-btn` / `#pause-overlay` を Tailwind クラスで再実装する
-- [ ] 3.8 DaisyUI の `btn` クラスを使って難易度ボタン・シェアボタンをスタイリングする
-- [ ] 3.9 アプリバージョン表示用の `<span id="app-version"></span>` を `#title-screen` に追加する
+- [x] 3.1 `index.html` のインライン `<style>` タグを削除する
+- [x] 3.2 `body` / `#game-container` のレイアウトクラスを Tailwind で記述する
+- [x] 3.3 `#hud-overlay` を Tailwind クラスで再実装する
+- [x] 3.4 `#title-screen` を縦画面は縦並び・横画面は2カラム（`landscape:flex-row`）のレイアウトで再実装する（ロゴ左・ボタン群右）
+- [x] 3.5 `#result-screen` を縦画面は縦並び・横画面は2カラムのレイアウトで再実装する
+- [x] 3.6 `#result-screen` に難易度表示用の空要素（`<div id="result-difficulty"></div>`）をあらかじめ配置する（非表示）
+- [x] 3.7 `#pause-btn` / `#pause-overlay` を Tailwind クラスで再実装する
+- [x] 3.8 DaisyUI の `btn` クラスを使って難易度ボタン・シェアボタンをスタイリングする
+- [x] 3.9 アプリバージョン表示用の `<span id="app-version"></span>` を `#title-screen` に追加する
 
 ## Task 4. DifficultyButtons 共通コンポーネントの作成
 
