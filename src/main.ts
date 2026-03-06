@@ -1,10 +1,12 @@
 import Phaser from "phaser";
 import { gameConfig } from "./config/gameConfig";
 import { CANVAS_W, CANVAS_H } from "./config/canvasConfig";
+import { getDifficultyById } from "./config/difficultyConfig";
 import { BootScene } from "./scenes/BootScene";
-import { TitleScene } from "./scenes/TitleScene";
 import { GameScene } from "./scenes/GameScene";
-import { ResultScene } from "./scenes/ResultScene";
+import { TitleUI } from "./ui/TitleUI";
+import { ResultUI } from "./ui/ResultUI";
+import { OrientationManager } from "./systems/OrientationManager";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -23,7 +25,26 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false,
     },
   },
-  scene: [BootScene, TitleScene, GameScene, ResultScene],
+  scene: [BootScene, GameScene],
 };
 
-new Phaser.Game(config);
+const game = new Phaser.Game(config);
+
+// HTML UI 層の初期化
+new TitleUI();
+new ResultUI();
+new OrientationManager(game);
+
+// タイトルからゲーム開始
+window.addEventListener("kakutei:startGame", (e) => {
+  const { difficultyId } = (e as CustomEvent<{ difficultyId: string }>).detail;
+  const difficulty = getDifficultyById(difficultyId);
+  game.scene.start("GameScene", { difficulty });
+});
+
+// リザルトからリトライ
+window.addEventListener("kakutei:retryGame", (e) => {
+  const { difficultyId } = (e as CustomEvent<{ difficultyId: string }>).detail;
+  const difficulty = getDifficultyById(difficultyId);
+  game.scene.start("GameScene", { difficulty });
+});

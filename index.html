@@ -27,10 +27,288 @@
         user-select: none;
         -webkit-user-select: none;
       }
+
+      /* ===== HUD オーバーレイ（ゲームプレイ中のみ表示） ===== */
+      #hud-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 10px 16px;
+        display: none;
+        justify-content: space-between;
+        align-items: center;
+        pointer-events: none;
+        z-index: 10;
+      }
+      #hud-overlay.visible {
+        display: flex;
+      }
+      #hud-receipts,
+      #hud-distance {
+        color: #fff;
+        font-size: 18px;
+        font-family: sans-serif;
+        text-shadow: 0 0 4px #000, 0 0 4px #000;
+      }
+
+      /* ===== タイトル画面 ===== */
+      #title-screen {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: #87ceeb;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        z-index: 100;
+      }
+      #title-screen.visible {
+        display: flex;
+      }
+      #title-screen h1 {
+        font-size: 48px;
+        color: #fff;
+        font-family: sans-serif;
+        text-shadow: 2px 2px 4px #333;
+      }
+      #title-screen > p {
+        font-size: 20px;
+        color: #eee;
+        font-family: sans-serif;
+      }
+      #difficulty-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+      }
+      .difficulty-btn {
+        font-size: 24px;
+        font-family: sans-serif;
+        padding: 12px 48px;
+        background: #444;
+        color: #aaa;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s;
+        min-width: 200px;
+      }
+      .difficulty-btn.selected {
+        background: #e09020;
+        color: #fff;
+      }
+      .difficulty-btn:hover:not(.selected) {
+        background: #555;
+      }
+      #start-btn {
+        font-size: 28px;
+        font-family: sans-serif;
+        padding: 14px 64px;
+        background: #e05020;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 8px;
+        transition: background 0.15s;
+      }
+      #start-btn:hover {
+        background: #ff6030;
+      }
+      #title-hint {
+        font-size: 14px;
+        color: #aaa;
+        font-family: sans-serif;
+      }
+
+      /* ===== リザルト画面 ===== */
+      #result-screen {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        z-index: 100;
+      }
+      #result-screen.visible {
+        display: flex;
+      }
+      #result-title {
+        font-size: 56px;
+        font-family: sans-serif;
+        text-shadow: 2px 2px 6px #000;
+      }
+      #result-score {
+        font-size: 32px;
+        color: #fff;
+        font-family: sans-serif;
+      }
+      #result-count {
+        font-size: 22px;
+        color: #bbb;
+        font-family: sans-serif;
+      }
+      #share-btn {
+        font-size: 22px;
+        font-family: sans-serif;
+        padding: 12px 40px;
+        background: #1da1f2;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 8px;
+        transition: background 0.15s;
+      }
+      #share-btn:hover {
+        background: #1a8cd8;
+      }
+      .retry-label {
+        font-size: 20px;
+        color: #ccc;
+        font-family: sans-serif;
+      }
+      #retry-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+      }
+      .retry-btn {
+        font-size: 22px;
+        font-family: sans-serif;
+        padding: 10px 40px;
+        background: #444;
+        color: #aaa;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        min-width: 200px;
+        transition: background 0.15s;
+      }
+      .retry-btn.current {
+        background: #e09020;
+        color: #fff;
+      }
+      .retry-btn:hover:not(.current) {
+        background: #555;
+      }
+
+      /* ===== 向き切り替えボタン（常時表示） ===== */
+      #orientation-toggle {
+        position: fixed;
+        top: 8px;
+        right: 8px;
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        font-size: 20px;
+        cursor: pointer;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* ===== ポーズボタン（ゲームプレイ中のみ表示） ===== */
+      #pause-btn {
+        position: fixed;
+        top: 8px;
+        right: 56px;
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        font-size: 18px;
+        cursor: pointer;
+        z-index: 200;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      #pause-btn.visible {
+        display: flex;
+      }
+
+      /* ===== ポーズオーバーレイ ===== */
+      #pause-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        z-index: 150;
+        cursor: pointer;
+      }
+      #pause-overlay.visible {
+        display: flex;
+      }
+      #pause-overlay p {
+        font-size: 48px;
+        color: #fff;
+        font-family: sans-serif;
+      }
+      #pause-overlay small {
+        font-size: 20px;
+        color: #aaa;
+        font-family: sans-serif;
+      }
     </style>
   </head>
-  <body>
+  <body class="portrait">
     <div id="game-container"></div>
+
+    <!-- HUD オーバーレイ（ゲームプレイ中のみ表示） -->
+    <div id="hud-overlay">
+      <span id="hud-receipts">レシート: 0 / 0</span>
+      <span id="hud-distance">距離: 0m</span>
+    </div>
+
+    <!-- タイトル画面 -->
+    <div id="title-screen">
+      <h1>確定申告ラン</h1>
+      <p>難易度を選択してください</p>
+      <div id="difficulty-buttons"></div>
+      <button id="start-btn">スタート</button>
+      <span id="title-hint">スペース or タップ: ジャンプ（長押しでチャージ）</span>
+    </div>
+
+    <!-- リザルト画面 -->
+    <div id="result-screen">
+      <div id="result-title"></div>
+      <div id="result-score"></div>
+      <div id="result-count"></div>
+      <button id="share-btn">📱 シェア</button>
+      <p class="retry-label">難易度を選んでリトライ</p>
+      <div id="retry-buttons"></div>
+    </div>
+
+    <!-- 向き切り替えボタン（常時表示） -->
+    <button id="orientation-toggle" title="画面回転">⟳</button>
+
+    <!-- ポーズボタン（ゲームプレイ中のみ表示） -->
+    <button id="pause-btn" title="ポーズ">⏸</button>
+
+    <!-- ポーズオーバーレイ -->
+    <div id="pause-overlay">
+      <p>⏸ PAUSE</p>
+      <small>タップして再開</small>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -15,7 +15,7 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.scene.start("TitleScene");
+    window.dispatchEvent(new CustomEvent("kakutei:assetsLoaded"));
   }
 
   // -------------------------------------------------
