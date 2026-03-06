@@ -98,34 +98,50 @@ git_workflow:
              **Python の `json.dump` で JSON ファイルを生成し `gh api --input` で渡す**方式を使うこと。
              zsh のヒアドキュメント・グロブ展開を完全に迂回できる。
            - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する（Unicode 特殊記号は問題ない）
-           - **手順**:
-             ```sh
-             # 1. リポジトリの nameWithOwner を取得
-             repo=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
+           - **手順**（Python スクリプトとして一括実行すること）:
+             ```python
+             import json, subprocess, tempfile, os
 
-             # 2. PR タイトルとボディを変数に格納
-             pr_title="タイトル"
-             pr_body=$(printf '## 概要\n\n（概要テキスト）\n\nCloses #<N>\n\n## 主な変更内容\n\n- 変更1\n- 変更2\n')
+             repo = subprocess.check_output(
+                 ['gh', 'repo', 'view', '--json', 'nameWithOwner', '--jq', '.nameWithOwner']
+             ).decode().strip()
+
+             pr_title = "タイトル"
+             pr_body = """## 概要
+
+（概要テキスト）
+
+Closes #<N>
+
+## 主な変更内容
+
+- 変更1
+- 変更2
+"""
              # Issue番号がない場合は Closes #... 行を省略する
 
-             # 3. Python で JSON を安全に生成（日本語・改行・特殊文字を自動エスケープ）
-             #    タイトル・ボディ・ブランチ名を引数で渡すことで zsh のグロブ展開を回避する
-             tmpfile=$(mktemp /tmp/pr_payload_XXXXXX.json)
-             python3 -c "
-             import json, sys
-             with open(sys.argv[1], 'w', encoding='utf-8') as f:
-                 json.dump({'title': sys.argv[2], 'body': sys.argv[3], 'head': sys.argv[4], 'base': 'develop'}, f, ensure_ascii=False)
-             " "$tmpfile" "$pr_title" "$pr_body" "<branch>"
+             payload = {
+                 'title': pr_title,
+                 'body': pr_body,
+                 'head': '<branch>',
+                 'base': 'develop'
+             }
 
-             # 4. PR 作成
-             result=$(gh api "repos/$repo/pulls" --input "$tmpfile")
-             pr_url=$(echo "$result" | jq -r '.html_url')
-             pr_number=$(echo "$result" | jq -r '.number')
+             # tempfile.mkstemp() で確実にユニークな一時ファイルを生成（macOS 互換）
+             fd, tmpfile = tempfile.mkstemp(suffix='.json')
+             try:
+                 with os.fdopen(fd, 'w', encoding='utf-8') as f:
+                     json.dump(payload, f, ensure_ascii=False)
+                 result = subprocess.check_output(
+                     ['gh', 'api', f'repos/{repo}/pulls', '--input', tmpfile]
+                 )
+             finally:
+                 os.remove(tmpfile)  # 成功・失敗問わず必ず削除
 
-             # 5. 一時ファイルを削除
-             rm "$tmpfile"
-
-             echo "PR 作成: $pr_url"
+             data = json.loads(result)
+             pr_url = data['html_url']
+             pr_number = data['number']
+             print(f"PR 作成: {pr_url}")
              ```
            - Issue番号がある場合: ラベルを取得し PR 番号経由で設定する
              ```sh

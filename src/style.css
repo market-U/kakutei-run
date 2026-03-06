@@ -3,6 +3,9 @@
 
 body {
   font-family: "DotGothic16", sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 /* JS から classList.add("visible") で表示切り替えするための上書きルール */
