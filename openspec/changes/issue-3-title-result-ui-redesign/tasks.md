@@ -27,17 +27,17 @@
 
 ## Task 4. DifficultyButtons 共通コンポーネントの作成
 
-- [ ] 4.1 `src/ui/DifficultyButtons.ts` を新規作成し、難易度ボタン群の DOM 生成・クリックコールバック呼び出しを実装する
+- [x] 4.1 `src/ui/DifficultyButtons.ts` を新規作成し、難易度ボタン群の DOM 生成・クリックコールバック呼び出しを実装する
 
 ## Task 5. TitleUI の修正
 
-- [ ] 5.1 スタートボタン（`#start-btn`）の参照と setupStartButton メソッドを削除する
-- [ ] 5.2 難易度ボタンを `DifficultyButtons` コンポーネントに置き換え、タップで即 `kakutei:startGame` を発火するよう変更する
-- [ ] 5.3 コンストラクタで `#app-version` 要素に `__APP_VERSION__` を設定する
+- [x] 5.1 スタートボタン（`#start-btn`）の参照と setupStartButton メソッドを削除する
+- [x] 5.2 難易度ボタンを `DifficultyButtons` コンポーネントに置き換え、タップで即 `kakutei:startGame` を発火するよう変更する
+- [x] 5.3 コンストラクタで `#app-version` 要素に `__APP_VERSION__` を設定する
 
 ## Task 6. ResultUI の修正
 
-- [ ] 6.1 難易度ボタン生成ロジックを `DifficultyButtons` コンポーネントに置き換える
+- [x] 6.1 難易度ボタン生成ロジックを `DifficultyButtons` コンポーネントに置き換える
 
 ## Task 7. 動作確認
 

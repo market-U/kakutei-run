@@ -1,4 +1,5 @@
-import { difficulties, getDifficultyById } from "../config/difficultyConfig";
+import { getDifficultyById } from "../config/difficultyConfig";
+import { DifficultyButtons } from "./DifficultyButtons";
 
 interface ResultDetail {
   result: "clear" | "gameover";
@@ -37,7 +38,16 @@ export class ResultUI {
     )!.textContent = `${collected} / ${total} 枚`;
 
     this.setupShareButton(score, difficultyId);
-    this.buildRetryButtons(difficultyId);
+
+    const retryContainer = document.getElementById("retry-buttons")!;
+    new DifficultyButtons(retryContainer, (selectedDifficultyId) => {
+      this.hide();
+      window.dispatchEvent(
+        new CustomEvent("kakutei:retryGame", {
+          detail: { difficultyId: selectedDifficultyId },
+        }),
+      );
+    });
 
     this.screen.classList.add("visible");
   }
@@ -64,29 +74,6 @@ export class ResultUI {
     } else {
       const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
       window.open(url, "_blank", "noopener");
-    }
-  }
-
-  private buildRetryButtons(currentDifficultyId: string): void {
-    const container = document.getElementById("retry-buttons")!;
-    container.innerHTML = "";
-
-    for (const diff of difficulties) {
-      const btn = document.createElement("button");
-      btn.className = "retry-btn";
-      if (diff.id === currentDifficultyId) btn.classList.add("current");
-      btn.textContent = diff.displayName;
-
-      btn.addEventListener("click", () => {
-        this.hide();
-        window.dispatchEvent(
-          new CustomEvent("kakutei:retryGame", {
-            detail: { difficultyId: diff.id },
-          }),
-        );
-      });
-
-      container.appendChild(btn);
     }
   }
 }
