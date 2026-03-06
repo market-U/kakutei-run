@@ -1,3 +1,4 @@
+import { diff } from "util";
 import { getDifficultyById } from "../config/difficultyConfig";
 import { DifficultyButtons } from "./DifficultyButtons";
 
@@ -27,9 +28,19 @@ export class ResultUI {
     const score = total > 0 ? Math.floor((collected / total) * 100) : 0;
 
     const titleEl = document.getElementById("result-title")!;
-    titleEl.textContent = isClear ? "クリア！" : "ゲームオーバー";
-    titleEl.style.color = isClear ? "#ffee00" : "#ff4444";
+    titleEl.textContent = isClear ? "確定おめでとう！" : "確定ならず…";
+    titleEl.style.color = isClear ? "#d7e633" : "#4ea8ed";
 
+    const difficultyEl = document.getElementById("result-difficulty")!;
+    const difficulty = getDifficultyById(difficultyId);
+    difficultyEl.textContent = difficulty.displayName;
+    difficultyEl.style.color = titleEl.style.color;
+    const crownEl = document.getElementById("result-crown")!;
+    if (isClear) {
+      crownEl.classList.remove("hidden");
+    } else {
+      crownEl.classList.add("hidden");
+    }
     document.getElementById(
       "result-score",
     )!.textContent = `レシート回収率: ${score}%`;
