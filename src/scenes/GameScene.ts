@@ -272,6 +272,7 @@ export class GameScene extends Phaser.Scene {
     ) {
       this.enemy.update(delta);
       this.collision.checkEnemyReached();
+      this.commentManager.update(delta);
       return;
     }
 
@@ -292,6 +293,7 @@ export class GameScene extends Phaser.Scene {
       for (const r of this.receipts) r.updateScroll(this.scrolledX, speed, delta);
       this.taxOffice.img.x = this.taxOffice.worldX - this.scrolledX;
       this.collision.checkEnemyReached();
+      this.commentManager.update(delta);
       return;
     }
 

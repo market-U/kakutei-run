@@ -6,6 +6,7 @@ interface CommentsData {
   common: string[];
   difficulty: Record<string, string[]>;
   events: {
+    start: string[];
     stumble: string[];
     goal: string[];
     backPain: string[];
@@ -13,13 +14,14 @@ interface CommentsData {
 }
 
 /** イベント種別 */
-export type CommentEventType = "stumble" | "goal" | "backPain";
+export type CommentEventType = "start" | "stumble" | "goal" | "backPain";
 
 /** フォールバック用最小コメント */
 const FALLBACK_COMMENTS: CommentsData = {
   common: ["がんばれ！", "走れ走れ！", "3月15日までに！"],
   difficulty: { easy: [], normal: [], hard: [] },
   events: {
+    start: ["スタート！", "いくぞ！"],
     stumble: ["あ！", "転んだ！"],
     goal: ["確定〜〜！！", "8888888888"],
     backPain: ["腰の死…！", "大丈夫か！？"],
@@ -27,10 +29,10 @@ const FALLBACK_COMMENTS: CommentsData = {
 };
 
 /** 全コメントが画面を横断するのにかかる時間（ms） */
-const CROSSING_DURATION = 6000;
+const CROSSING_DURATION = 4000;
 
-/** レーンの Y 座標一覧 */
-const LANE_Y_POSITIONS = [25, 55, 85, 115, 145, 175];
+/** レーンの Y 座標一覧（画面全体、60px 間隔） */
+const LANE_Y_POSITIONS = [25, 85, 145, 205, 265, 325, 385, 445, 500];
 
 /** 次のコメントを投入できる「前コメント進捗率」しきい値 */
 const LANE_FREE_THRESHOLD = 0.3;
@@ -39,6 +41,10 @@ const LANE_FREE_THRESHOLD = 0.3;
 const SPAWN_INTERVAL_MIN = 2000;
 const SPAWN_INTERVAL_MAX = 3500;
 
+/** バーストコメント間の投入間隔（ms） */
+const BURST_INTERVAL_MIN = 200;
+const BURST_INTERVAL_MAX = 600;
+
 /** コメントの深度 */
 const COMMENT_DEPTH = 20;
 
@@ -46,7 +52,7 @@ const COMMENT_DEPTH = 20;
 const COMMENT_ALPHA = 0.82;
 
 /** コメントのフォントサイズ */
-const FONT_SIZE = "24px";
+const FONT_SIZE = "48px";
 
 /** レーン管理データ */
 interface Lane {
@@ -86,9 +92,9 @@ export class CommentManager {
   /** 次のスポーンまでの残り時間（ms） */
   private spawnTimer = 0;
 
-  /** バースト投入キュー: { text, delay } */
-  private burstQueue: Array<{ text: string; delay: number }> = [];
-  /** バースト残タイマー（ms） */
+  /** バースト投入キュー */
+  private burstQueue: string[] = [];
+  /** バースト残タイマー（ms）*/
   private burstTimer = 0;
 
   constructor(scene: Phaser.Scene) {
@@ -122,7 +128,10 @@ export class CommentManager {
   startGame(difficultyId: string): void {
     const diffComments = this.data.difficulty[difficultyId] ?? [];
     this.activePool = [...this.data.common, ...diffComments];
-    this.resetSpawnTimer();
+    // 最初のコメントをすぐ出す
+    this.spawnTimer = 300;
+    // スタート応援バーストを投入
+    this.triggerEvent("start", 4);
   }
 
   /**
@@ -138,8 +147,7 @@ export class CommentManager {
 
     for (let i = 0; i < count; i++) {
       const text = merged[Math.floor(Math.random() * merged.length)];
-      // コメントを 150ms 間隔でずらして投入
-      this.burstQueue.push({ text, delay: i * 150 });
+      this.burstQueue.push(text);
     }
   }
 
@@ -169,13 +177,15 @@ export class CommentManager {
       }
     }
 
-    // バーストキュー処理
+    // バーストキュー処理（ランダム間隔で投入）
     if (this.burstQueue.length > 0) {
       this.burstTimer -= delta;
       if (this.burstTimer <= 0) {
-        const item = this.burstQueue.shift()!;
-        this.spawnComment(item.text);
-        this.burstTimer = item.delay > 0 ? 150 : 0;
+        const text = this.burstQueue.shift()!;
+        this.spawnComment(text);
+        this.burstTimer =
+          BURST_INTERVAL_MIN +
+          Math.random() * (BURST_INTERVAL_MAX - BURST_INTERVAL_MIN);
       }
     }
 
@@ -201,16 +211,16 @@ export class CommentManager {
     }
   }
 
-  get isEnabled(): boolean {
-    return this.enabled;
-  }
-
   destroy(): void {
     for (const c of this.activeComments) {
       c.text.destroy();
     }
     this.activeComments = [];
     this.burstQueue = [];
+  }
+
+  get isEnabled(): boolean {
+    return this.enabled;
   }
 
   // -------------------------------------------------
