@@ -20,6 +20,7 @@ import { Receipt } from "../objects/Receipt";
 import { Enemy } from "../objects/Enemy";
 import { HUD } from "../ui/HUD";
 import { AssetKeys } from "../assets/AssetKeys";
+import { CommentManager } from "../systems/CommentManager";
 
 /** ゲームプレイゾーン内の画面幅（ロジック用） */
 const GAME_W = CANVAS_W;
@@ -55,6 +56,7 @@ export class GameScene extends Phaser.Scene {
   private enemy!: Enemy;
   private hud!: HUD;
   private collision!: CollisionManager;
+  private commentManager!: CommentManager;
 
   private stones: Stone[] = [];
   private witches: Witch[] = [];
@@ -81,6 +83,7 @@ export class GameScene extends Phaser.Scene {
   private onOrientationChanged!: () => void;
   private onPauseBtnClick!: () => void;
   private onPauseOverlayClick!: () => void;
+  private onCommentToggleBtnClick!: () => void;
   private onDocumentPointerDown!: (e: PointerEvent) => void;
   private onDocumentPointerUp!: () => void;
 
@@ -181,6 +184,12 @@ export class GameScene extends Phaser.Scene {
     // --- CollisionManager ---
     this.collision = new CollisionManager(this, this.player, this.enemy);
 
+    // --- CommentManager ---
+    this.commentManager = new CommentManager(this);
+    void this.commentManager.load().then(() => {
+      this.commentManager.startGame(this.difficulty.id);
+    });
+
     // --- イベントハンドラ（再起動時の累積を防ぐため事前に off する） ---
     this.events.off("stoneHit", this.onStoneHit, this);
     this.events.off("witchHit", this.onWitchHit, this);
@@ -208,10 +217,14 @@ export class GameScene extends Phaser.Scene {
     document.addEventListener("pointerdown", this.onDocumentPointerDown);
     document.addEventListener("pointerup", this.onDocumentPointerUp);
 
-    // --- ポーズ関連の window イベントリスナー ---
+    // --- ポーズ・コメントトグル関連の window イベントリスナー ---
     this.onPauseBtnClick = () => this.pause();
     this.onOrientationChanged = () => this.pause();
     this.onPauseOverlayClick = () => this.resume();
+    this.onCommentToggleBtnClick = () => {
+      this.commentManager.setEnabled(!this.commentManager.isEnabled);
+      this.hud.setCommentEnabled(this.commentManager.isEnabled);
+    };
 
     document
       .getElementById("pause-btn")!
@@ -220,6 +233,9 @@ export class GameScene extends Phaser.Scene {
     document
       .getElementById("pause-overlay")!
       .addEventListener("click", this.onPauseOverlayClick);
+    document
+      .getElementById("comment-toggle-btn")!
+      .addEventListener("click", this.onCommentToggleBtnClick);
 
     // shutdown 時にリスナーを明示的にクリーンアップ
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -237,8 +253,12 @@ export class GameScene extends Phaser.Scene {
       document
         .getElementById("pause-overlay")
         ?.removeEventListener("click", this.onPauseOverlayClick);
+      document
+        .getElementById("comment-toggle-btn")
+        ?.removeEventListener("click", this.onCommentToggleBtnClick);
       document.removeEventListener("pointerdown", this.onDocumentPointerDown);
       document.removeEventListener("pointerup", this.onDocumentPointerUp);
+      this.commentManager.destroy();
     });
   }
 
@@ -252,6 +272,7 @@ export class GameScene extends Phaser.Scene {
     ) {
       this.enemy.update(delta);
       this.collision.checkEnemyReached();
+      this.commentManager.update(delta);
       return;
     }
 
@@ -272,6 +293,7 @@ export class GameScene extends Phaser.Scene {
       for (const r of this.receipts) r.updateScroll(this.scrolledX, speed, delta);
       this.taxOffice.img.x = this.taxOffice.worldX - this.scrolledX;
       this.collision.checkEnemyReached();
+      this.commentManager.update(delta);
       return;
     }
 
@@ -301,6 +323,9 @@ export class GameScene extends Phaser.Scene {
     this.collision.checkReceipts(this.receipts);
     this.collision.checkEnemyReached();
 
+    // コメント更新
+    this.commentManager.update(delta);
+
     // HUD 更新
     this.hud.setDistance(Math.floor(this.scrolledX / 10)); // px → m 変換
     this.hud.setCollectedCount(this.collectedCount);
@@ -319,6 +344,7 @@ export class GameScene extends Phaser.Scene {
   // -------------------------------------------------
   private onStoneHit(): void {
     if (this.state !== "playing" && this.state !== "back_pain_slow") return;
+    this.commentManager.triggerEvent("stumble", 6);
     // 腰痛スロータイマーが残っていればキャンセルする
     if (this.backPainTimer) {
       this.backPainTimer.remove(false);
@@ -346,6 +372,7 @@ export class GameScene extends Phaser.Scene {
 
   private onBackPainStart(slowDuration: number): void {
     if (this.state !== "playing" && this.state !== "back_pain_slow") return;
+    this.commentManager.triggerEvent("backPain", 4);
     this.state = "back_pain_slow";
     this.scrollManager.setSpeed(this.slowedScrollSpeed);
     this.enemy.applyWitchHit(slowDuration);
@@ -370,6 +397,7 @@ export class GameScene extends Phaser.Scene {
     this.state = "game_over";
     this.scrollManager.stop();
     this.enemy.stopChasing();
+    this.commentManager.startLoopBurst("stumble", 6);
     this.player.triggerEnemyCaught();
     this.time.delayedCall(2000, () => {
       this.hud.destroy();
@@ -391,6 +419,7 @@ export class GameScene extends Phaser.Scene {
     this.state = "game_over";
     this.scrollManager.stop();
     this.enemy.stopChasing();
+    this.commentManager.startLoopBurst("stumble", 6);
     this.time.delayedCall(2000, () => {
       this.hud.destroy();
       window.dispatchEvent(
@@ -410,6 +439,7 @@ export class GameScene extends Phaser.Scene {
     if (this.state === "game_over" || this.state === "cleared") return;
     this.state = "cleared";
     this.scrollManager.stop();
+    this.commentManager.startLoopBurst("goal", 9);
     this.player.triggerGoal();
     this.showClearEffect();
 

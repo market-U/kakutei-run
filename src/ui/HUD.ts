@@ -2,6 +2,7 @@
 export class HUD {
   private receiptsEl: HTMLElement;
   private distanceEl: HTMLElement;
+  private commentToggleBtn: HTMLElement;
 
   private collectedCount = 0;
   private totalCount = 0;
@@ -12,9 +13,11 @@ export class HUD {
 
     this.receiptsEl = document.getElementById("hud-receipts")!;
     this.distanceEl = document.getElementById("hud-distance")!;
+    this.commentToggleBtn = document.getElementById("comment-toggle-btn")!;
 
     document.getElementById("hud-overlay")!.classList.add("visible");
     document.getElementById("pause-btn")!.classList.add("visible");
+    this.commentToggleBtn.classList.add("visible");
 
     this.refresh();
   }
@@ -29,9 +32,14 @@ export class HUD {
     this.refresh();
   }
 
+  setCommentEnabled(enabled: boolean): void {
+    this.commentToggleBtn.style.opacity = enabled ? "1" : "0.4";
+  }
+
   destroy(): void {
     document.getElementById("hud-overlay")!.classList.remove("visible");
     document.getElementById("pause-btn")!.classList.remove("visible");
+    this.commentToggleBtn.classList.remove("visible");
   }
 
   private refresh(): void {
