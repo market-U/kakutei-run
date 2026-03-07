@@ -2,17 +2,17 @@
 
 ## 1. コメントデータの準備
 
-- [ ] 1.1 `public/comments.json` を作成し、全カテゴリ（common / difficulty / events）のモックコメントを記述する
+- [x] 1.1 `public/comments.json` を作成し、全カテゴリ（common / difficulty / events）のモックコメントを記述する
 
 ## 2. CommentManager の実装
 
-- [ ] 2.1 `src/systems/CommentManager.ts` を作成し、`load(url)` による `comments.json` の fetch とフォールバック処理を実装する
-- [ ] 2.2 `startGame(difficultyId)` でアクティブプール（common + difficulty）を合成する処理を実装する
-- [ ] 2.3 6 レーン構成のレーン管理ロジック（重なり防止・レーン選択）を実装する
-- [ ] 2.4 コメントスポーン処理（通常の定期スポーン・速度計算・Phaser Text 生成・画面外で自動 destroy）を実装する
-- [ ] 2.5 `triggerEvent(type, count)` によるバーストスポーン処理を実装する
-- [ ] 2.6 `setEnabled(v)` によるコメント表示 ON/OFF 切り替えを実装する
-- [ ] 2.7 `update(delta)` でアクティブコメントを毎フレーム移動させる処理を実装する
+- [x] 2.1 `src/systems/CommentManager.ts` を作成し、`load(url)` による `comments.json` の fetch とフォールバック処理を実装する
+- [x] 2.2 `startGame(difficultyId)` でアクティブプール（common + difficulty）を合成する処理を実装する
+- [x] 2.3 6 レーン構成のレーン管理ロジック（重なり防止・レーン選択）を実装する
+- [x] 2.4 コメントスポーン処理（通常の定期スポーン・速度計算・Phaser Text 生成・画面外で自動 destroy）を実装する
+- [x] 2.5 `triggerEvent(type, count)` によるバーストスポーン処理を実装する
+- [x] 2.6 `setEnabled(v)` によるコメント表示 ON/OFF 切り替えを実装する
+- [x] 2.7 `update(delta)` でアクティブコメントを毎フレーム移動させる処理を実装する
 
 ## 3. GameScene への統合
 
