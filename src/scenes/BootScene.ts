@@ -113,13 +113,19 @@ export class BootScene extends Phaser.Scene {
         endFrame: FrameCount.WITCH_FLOAT - 1,
       },
     );
+    this.load.spritesheet(
+      AssetKeys.RECEIPT,
+      "/assets/sprites/receipt.png",
+      {
+        frameWidth: FrameSize.RECEIPT.width,
+        frameHeight: FrameSize.RECEIPT.height,
+        endFrame: FrameCount.RECEIPT - 1,
+      },
+    );
   }
 
   private loadStaticImages(): void {
     this.load.image(AssetKeys.TAX_OFFICE, "/assets/sprites/tax_office.png");
-    this.load.image(AssetKeys.RECEIPT_1, "/assets/sprites/receipt_1.png");
-    this.load.image(AssetKeys.RECEIPT_2, "/assets/sprites/receipt_2.png");
-    this.load.image(AssetKeys.RECEIPT_3, "/assets/sprites/receipt_3.png");
     this.load.image(AssetKeys.STONE_1, "/assets/sprites/stone_1.png");
     this.load.image(AssetKeys.STONE_2, "/assets/sprites/stone_2.png");
     this.load.image(AssetKeys.STONE_3, "/assets/sprites/stone_3.png");
