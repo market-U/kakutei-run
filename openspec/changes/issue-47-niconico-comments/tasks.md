@@ -16,15 +16,15 @@
 
 ## 3. GameScene への統合
 
-- [ ] 3.1 `GameScene.create()` で `CommentManager` をインスタンス化し、`load()` を呼び出す
-- [ ] 3.2 `stoneHit` イベントで `triggerEvent('stumble', 6)` を呼び出す
-- [ ] 3.3 `backPainActivated` イベントで `triggerEvent('backPain', 4)` を呼び出す
-- [ ] 3.4 ゴール到達時（`onGoalReached`）で `triggerEvent('goal', 9)` を呼び出す
-- [ ] 3.5 `GameScene.update()` で `CommentManager.update(delta)` を呼び出す
-- [ ] 3.6 `SHUTDOWN` イベントで `CommentManager.destroy()` を呼び出す
+- [x] 3.1 `GameScene.create()` で `CommentManager` をインスタンス化し、`load()` を呼び出す
+- [x] 3.2 `stoneHit` イベントで `triggerEvent('stumble', 6)` を呼び出す
+- [x] 3.3 `backPainActivated` イベントで `triggerEvent('backPain', 4)` を呼び出す
+- [x] 3.4 ゴール到達時（`onGoalReached`）で `triggerEvent('goal', 9)` を呼び出す
+- [x] 3.5 `GameScene.update()` で `CommentManager.update(delta)` を呼び出す
+- [x] 3.6 `SHUTDOWN` イベントで `CommentManager.destroy()` を呼び出す
 
 ## 4. HUD トグルボタンの追加
 
-- [ ] 4.1 `index.html` にコメントトグルボタン要素（`id="comment-toggle-btn"`）を `pause-btn` の隣に追加する
-- [ ] 4.2 `HUD.ts` でトグルボタンの表示/非表示と ON/OFF 状態の視覚フィードバック（opacity）を制御する
-- [ ] 4.3 トグルボタンのクリックイベントで `CommentManager.setEnabled()` を呼び出す処理を `GameScene` に追加する
+- [x] 4.1 `index.html` にコメントトグルボタン要素（`id="comment-toggle-btn"`）を `pause-btn` の隣に追加する
+- [x] 4.2 `HUD.ts` でトグルボタンの表示/非表示と ON/OFF 状態の視覚フィードバック（opacity）を制御する
+- [x] 4.3 トグルボタンのクリックイベントで `CommentManager.setEnabled()` を呼び出す処理を `GameScene` に追加する
