@@ -54,6 +54,8 @@ git_workflow:
         1. `git rev-parse --verify develop` で develop ブランチの存在を確認する
            - 存在しない場合は処理を中断し、「develop ブランチがまだ作成されていません。main でのデプロイ設定が完了したら `git checkout -b develop` で develop を作成してください。」とユーザーへ伝える
         2. `git checkout develop` でベースブランチに移動する
+        2b. `git pull origin develop` で develop を最新状態に更新する
+            - pull に失敗した場合は処理を中断し、エラー内容をユーザーへ伝える
         3. ブランチ名を決定する（naming.branch のルールに従う）
            - Issue番号がある場合: `gh issue view <N> --json labels --jq '[.labels[].name]'` で "Bug" ラベルの有無を確認する
              - "Bug" ラベルあり: `fix/issue-<N>-<name>`
