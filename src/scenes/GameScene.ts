@@ -397,6 +397,7 @@ export class GameScene extends Phaser.Scene {
     this.state = "game_over";
     this.scrollManager.stop();
     this.enemy.stopChasing();
+    this.commentManager.startLoopBurst("stumble", 6);
     this.player.triggerEnemyCaught();
     this.time.delayedCall(2000, () => {
       this.hud.destroy();
@@ -418,6 +419,7 @@ export class GameScene extends Phaser.Scene {
     this.state = "game_over";
     this.scrollManager.stop();
     this.enemy.stopChasing();
+    this.commentManager.startLoopBurst("stumble", 6);
     this.time.delayedCall(2000, () => {
       this.hud.destroy();
       window.dispatchEvent(
@@ -437,7 +439,7 @@ export class GameScene extends Phaser.Scene {
     if (this.state === "game_over" || this.state === "cleared") return;
     this.state = "cleared";
     this.scrollManager.stop();
-    this.commentManager.triggerEvent("goal", 9);
+    this.commentManager.startLoopBurst("goal", 9);
     this.player.triggerGoal();
     this.showClearEffect();
 

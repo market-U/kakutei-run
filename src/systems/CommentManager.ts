@@ -32,7 +32,7 @@ const FALLBACK_COMMENTS: CommentsData = {
 const CROSSING_DURATION = 3000;
 
 /** レーンの Y 座標一覧（画面全体、60px 間隔） */
-const LANE_Y_POSITIONS = [25, 85, 145, 205, 265, 325, 385, 445, 500];
+const LANE_Y_POSITIONS = [25, 85, 145, 205, 265, 325, 385, 445, 475];
 
 /** 次のコメントを投入できる「前コメント進捗率」しきい値 */
 const LANE_FREE_THRESHOLD = 0.3;
@@ -97,6 +97,11 @@ export class CommentManager {
   /** バースト残タイマー（ms）*/
   private burstTimer = 0;
 
+  /** ループバーストのイベント種別（null = ループなし）*/
+  private burstLoopType: CommentEventType | null = null;
+  /** ループバーストの1バッチあたりの投入数 */
+  private burstLoopCount = 0;
+
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.lanes = LANE_Y_POSITIONS.map(() => ({
@@ -141,6 +146,7 @@ export class CommentManager {
    */
   triggerEvent(type: CommentEventType, count: number): void {
     if (!this.enabled) return;
+    this.burstLoopType = null;
     this.burstQueue = [];
     const eventPool = this.data.events[type] ?? [];
     if (eventPool.length === 0) return;
@@ -148,6 +154,24 @@ export class CommentManager {
     for (let i = 0; i < count; i++) {
       const text = eventPool[Math.floor(Math.random() * eventPool.length)];
       this.burstQueue.push(text);
+    }
+  }
+
+  /**
+   * イベントコメントをループバーストで流し続ける。
+   * ゲームオーバー・クリア後にリザルト画面が表示されている間も継続させるために使用する。
+   * @param type イベント種別
+   * @param count 1バッチあたりの投入数
+   */
+  startLoopBurst(type: CommentEventType, count: number): void {
+    if (!this.enabled) return;
+    this.burstLoopType = type;
+    this.burstLoopCount = count;
+    this.burstQueue = [];
+    const eventPool = this.data.events[type] ?? [];
+    if (eventPool.length === 0) return;
+    for (let i = 0; i < count; i++) {
+      this.burstQueue.push(eventPool[Math.floor(Math.random() * eventPool.length)]);
     }
   }
 
@@ -189,6 +213,16 @@ export class CommentManager {
       }
     }
 
+    // ループバースト: キューが空になったら同じイベントで再投入
+    if (this.burstLoopType !== null && this.burstQueue.length === 0) {
+      const eventPool = this.data.events[this.burstLoopType] ?? [];
+      if (eventPool.length > 0) {
+        for (let i = 0; i < this.burstLoopCount; i++) {
+          this.burstQueue.push(eventPool[Math.floor(Math.random() * eventPool.length)]);
+        }
+      }
+    }
+
     // 通常スポーン
     this.spawnTimer -= delta;
     if (this.spawnTimer <= 0) {
@@ -208,6 +242,7 @@ export class CommentManager {
       }
       this.activeComments = [];
       this.burstQueue = [];
+      this.burstLoopType = null;
     }
   }
 
@@ -217,6 +252,7 @@ export class CommentManager {
     }
     this.activeComments = [];
     this.burstQueue = [];
+    this.burstLoopType = null;
   }
 
   get isEnabled(): boolean {
