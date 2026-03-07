@@ -2,32 +2,32 @@
 
 ## 1. CommentManager の fetch ロジック修正
 
-- [ ] 1.1 `load()` メソッドの引数を `url` から削除し、`VITE_COMMENTS_URL` を参照するよう変更する
-- [ ] 1.2 `AbortController` を使った 5 秒タイムアウト付き fetch ヘルパー関数を追加する
-- [ ] 1.3 最大 3 回リトライするループを実装する（失敗時は即リトライ）
-- [ ] 1.4 3 回すべて失敗した場合に `/comments.json`（バンドル済み）へフォールバックする処理を追加する
-- [ ] 1.5 `VITE_COMMENTS_URL` が未設定の場合はバンドル済み `/comments.json` を直接 fetch するよう分岐を追加する
-- [ ] 1.6 `window.__commentsData` へキャッシュを保存・参照するロジックを追加する（`CommentsData | null` 型宣言含む）
+- [x] 1.1 `load()` メソッドの引数を `url` から削除し、`VITE_COMMENTS_URL` を参照するよう変更する
+- [x] 1.2 `AbortController` を使った 5 秒タイムアウト付き fetch ヘルパー関数を追加する
+- [x] 1.3 最大 3 回リトライするループを実装する（失敗時は即リトライ）
+- [x] 1.4 3 回すべて失敗した場合に `/comments.json`（バンドル済み）へフォールバックする処理を追加する
+- [x] 1.5 `VITE_COMMENTS_URL` が未設定の場合はバンドル済み `/comments.json` を直接 fetch するよう分岐を追加する
+- [x] 1.6 `window.__commentsData` へキャッシュを保存・参照するロジックを追加する（`CommentsData | null` 型宣言含む）
 
 ## 2. TitleUI のロード制御追加
 
-- [ ] 2.1 `kakutei:assetsLoaded` イベントのハンドラ内で fetch を呼び出す
-- [ ] 2.2 fetch 開始時に DaisyUI スピナーを難易度ボタン領域に表示し、ボタンを disabled にする
-- [ ] 2.3 fetch 完了（成功・フォールバック問わず）後にスピナーを非表示にし、ボタンを有効化する
+- [x] 2.1 `kakutei:assetsLoaded` イベントのハンドラ内で fetch を呼び出す
+- [x] 2.2 fetch 開始時に DaisyUI スピナーを難易度ボタン領域に表示し、ボタンを disabled にする
+- [x] 2.3 fetch 完了（成功・フォールバック問わず）後にスピナーを非表示にし、ボタンを有効化する
 
 ## 3. DifficultyButtons の disabled 制御追加
 
-- [ ] 3.1 外部から disabled 状態を切り替えられるメソッドを追加する
+- [x] 3.1 外部から disabled 状態を切り替えられるメソッドを追加する
 
 ## 4. GameScene のクリーンアップ
 
-- [ ] 4.1 `GameScene.create()` 内の `commentManager.load()` 呼び出しを削除し、キャッシュ済みデータを使うよう変更する
+- [x] 4.1 `GameScene.create()` 内の `commentManager.load()` 呼び出しを削除し、キャッシュ済みデータを使うよう変更する
 
 ## 5. 環境変数の整備
 
-- [ ] 5.1 `.env.example` に `VITE_COMMENTS_URL=` を追記する
-- [ ] 5.2 GitHub Actions シークレット `VITE_COMMENTS_URL` に Blob URL を登録する（手順は下記参照）
-- [ ] 5.3 GitHub Actions のビルドワークフローで `VITE_COMMENTS_URL` をビルド時に渡す設定を追加する
+- [x] 5.1 `.env.example` に `VITE_COMMENTS_URL=` を追記する
+- [x] 5.2 GitHub Actions シークレット `VITE_COMMENTS_URL` に Blob URL を登録する（手順は下記参照）
+- [x] 5.3 GitHub Actions のビルドワークフローで `VITE_COMMENTS_URL` をビルド時に渡す設定を追加する
 
 ### GitHub への環境変数設定手順
 

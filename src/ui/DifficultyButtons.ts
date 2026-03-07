@@ -2,6 +2,8 @@ import { difficulties } from "../config/difficultyConfig";
 
 /** 難易度ボタン群の共通コンポーネント */
 export class DifficultyButtons {
+  private buttons: HTMLButtonElement[] = [];
+
   constructor(
     container: HTMLElement,
     onSelect: (difficultyId: string) => void,
@@ -20,6 +22,14 @@ export class DifficultyButtons {
       });
 
       container.appendChild(btn);
+      this.buttons.push(btn);
+    }
+  }
+
+  /** ボタンの有効・無効を切り替える */
+  setDisabled(disabled: boolean): void {
+    for (const btn of this.buttons) {
+      btn.disabled = disabled;
     }
   }
 }
