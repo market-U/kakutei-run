@@ -29,10 +29,10 @@ const FALLBACK_COMMENTS: CommentsData = {
 };
 
 /** 全コメントが画面を横断するのにかかる時間（ms） */
-const CROSSING_DURATION = 3000;
+const CROSSING_DURATION = 3500;
 
 /** レーンの Y 座標一覧（画面全体、60px 間隔） */
-const LANE_Y_POSITIONS = [25, 85, 145, 205, 265, 325, 385, 445, 475];
+const LANE_Y_POSITIONS = [25, 80, 135, 190, 245, 300, 355, 410, 475];
 
 /** 次のコメントを投入できる「前コメント進捗率」しきい値 */
 const LANE_FREE_THRESHOLD = 0.3;
@@ -52,7 +52,7 @@ const COMMENT_DEPTH = 20;
 const COMMENT_ALPHA = 0.82;
 
 /** コメントのフォントサイズ */
-const FONT_SIZE = "48px";
+const FONT_SIZE = "46px";
 
 /** レーン管理データ */
 interface Lane {
@@ -276,7 +276,7 @@ export class CommentManager {
     const y = LANE_Y_POSITIONS[laneIndex];
     const textObj = this.scene.add
       .text(CANVAS_W + 20, y, commentText, {
-        fontFamily: "DotGothic16, sans-serif",
+        fontFamily: "LINE Seed JP, sans-serif",
         fontSize: FONT_SIZE,
         color: "#ffffff",
         shadow: {
