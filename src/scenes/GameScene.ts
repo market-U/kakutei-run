@@ -186,9 +186,7 @@ export class GameScene extends Phaser.Scene {
 
     // --- CommentManager ---
     this.commentManager = new CommentManager(this);
-    void this.commentManager.load().then(() => {
-      this.commentManager.startGame(this.difficulty.id);
-    });
+    this.commentManager.startGame(this.difficulty.id);
 
     // --- イベントハンドラ（再起動時の累積を防ぐため事前に off する） ---
     this.events.off("stoneHit", this.onStoneHit, this);

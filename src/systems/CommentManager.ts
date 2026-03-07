@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { CANVAS_W } from "../config/canvasConfig";
 
 /** コメント JSON のカテゴリ構造 */
-interface CommentsData {
+export interface CommentsData {
   common: string[];
   difficulty: Record<string, string[]>;
   events: {
@@ -11,6 +11,12 @@ interface CommentsData {
     goal: string[];
     backPain: string[];
   };
+}
+
+declare global {
+  interface Window {
+    __commentsData?: CommentsData | null;
+  }
 }
 
 /** イベント種別 */
@@ -27,6 +33,67 @@ const FALLBACK_COMMENTS: CommentsData = {
     backPain: ["腰の死…！", "大丈夫か！？"],
   },
 };
+
+/** fetch タイムアウト（ms） */
+const FETCH_TIMEOUT_MS = 5000;
+/** fetch リトライ最大回数 */
+const FETCH_MAX_RETRIES = 3;
+
+/**
+ * AbortController を使ったタイムアウト付き fetch。
+ * タイムアウトまたはネットワークエラー時は例外を投げる。
+ */
+async function fetchWithTimeout(url: string): Promise<CommentsData> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return (await res.json()) as CommentsData;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * コメントデータを外部 URL から取得し `window.__commentsData` へキャッシュする。
+ * タイトル画面表示時に呼び出すこと。
+ *
+ * フォールバック順序:
+ *   1. VITE_COMMENTS_URL (Azure Blob) をリトライ付きで fetch
+ *   2. バンドル済み /comments.json を fetch
+ *   3. ハードコード FALLBACK_COMMENTS 定数
+ */
+export async function loadCommentsData(): Promise<void> {
+  const blobUrl = import.meta.env.VITE_COMMENTS_URL;
+
+  if (blobUrl) {
+    for (let i = 0; i < FETCH_MAX_RETRIES; i++) {
+      try {
+        window.__commentsData = await fetchWithTimeout(blobUrl);
+        return;
+      } catch (e) {
+        console.warn(
+          `[CommentManager] Blob fetch 失敗 (${i + 1}/${FETCH_MAX_RETRIES}):`,
+          e,
+        );
+      }
+    }
+  }
+
+  try {
+    const res = await fetch("/comments.json");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    window.__commentsData = (await res.json()) as CommentsData;
+    console.warn("[CommentManager] バンドル済み comments.json を使用します");
+  } catch (e) {
+    console.warn(
+      "[CommentManager] フォールバックも失敗。ハードコード定数を使用します:",
+      e,
+    );
+    window.__commentsData = FALLBACK_COMMENTS;
+  }
+}
 
 /** 全コメントが画面を横断するのにかかる時間（ms） */
 const CROSSING_DURATION = 3500;
@@ -104,26 +171,12 @@ export class CommentManager {
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
+    this.data = window.__commentsData ?? FALLBACK_COMMENTS;
     this.lanes = LANE_Y_POSITIONS.map(() => ({
       progressPx: Infinity,
       totalDistancePx: 1,
     }));
     this.resetSpawnTimer();
-  }
-
-  /**
-   * コメントデータを fetch で読み込む。
-   * 失敗時はフォールバックを使用する。
-   */
-  async load(url = "/comments.json"): Promise<void> {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      this.data = (await res.json()) as CommentsData;
-    } catch (e) {
-      console.warn("[CommentManager] comments.json の読み込みに失敗。フォールバックを使用します:", e);
-      this.data = FALLBACK_COMMENTS;
-    }
   }
 
   /**
