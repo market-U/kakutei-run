@@ -143,11 +143,10 @@ export class CommentManager {
     if (!this.enabled) return;
     this.burstQueue = [];
     const eventPool = this.data.events[type] ?? [];
-    const merged = [...eventPool, ...this.activePool];
-    if (merged.length === 0) return;
+    if (eventPool.length === 0) return;
 
     for (let i = 0; i < count; i++) {
-      const text = merged[Math.floor(Math.random() * merged.length)];
+      const text = eventPool[Math.floor(Math.random() * eventPool.length)];
       this.burstQueue.push(text);
     }
   }
