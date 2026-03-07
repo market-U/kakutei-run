@@ -29,7 +29,7 @@ const FALLBACK_COMMENTS: CommentsData = {
 };
 
 /** 全コメントが画面を横断するのにかかる時間（ms） */
-const CROSSING_DURATION = 4000;
+const CROSSING_DURATION = 3000;
 
 /** レーンの Y 座標一覧（画面全体、60px 間隔） */
 const LANE_Y_POSITIONS = [25, 85, 145, 205, 265, 325, 385, 445, 500];
@@ -141,6 +141,7 @@ export class CommentManager {
    */
   triggerEvent(type: CommentEventType, count: number): void {
     if (!this.enabled) return;
+    this.burstQueue = [];
     const eventPool = this.data.events[type] ?? [];
     const merged = [...eventPool, ...this.activePool];
     if (merged.length === 0) return;
