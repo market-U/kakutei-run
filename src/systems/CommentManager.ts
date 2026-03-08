@@ -290,6 +290,18 @@ export class CommentManager {
   }
 
   /**
+   * 新規コメントの投入を停止する。
+   * 画面上を流れ中のコメントはそのまま表示し続ける。
+   * CROSSING_DURATION 後に setEnabled(false) を呼ぶと自然にフェードアウトできる。
+   */
+  stopSpawning(): void {
+    this.burstLoopType = null;
+    this.burstQueue = [];
+    // Infinity にすることで spawnTimer -= delta が永遠に 0 以下にならない
+    this.spawnTimer = Infinity;
+  }
+
+  /**
    * コメント表示の ON/OFF を切り替える。
    */
   setEnabled(enabled: boolean): void {
