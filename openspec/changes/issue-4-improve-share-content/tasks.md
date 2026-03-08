@@ -2,10 +2,10 @@
 
 ## 1. CommentManager に感動スコア機能を追加
 
-- [ ] 1.1 `CommentManager` にシェア用コメント候補オブジェクト `{ comment: string, score: number } | null` フィールドを追加する
-- [ ] 1.2 `startGame()` で候補を `null` にリセットする処理を追加する
-- [ ] 1.3 `spawnComment()` で感動スコア（0〜100 のランダム整数）を生成し、保存済みスコアより高ければ候補を置き換える処理を追加する
-- [ ] 1.4 `getShareComment(): string | null` ゲッターを追加する
+- [x] 1.1 `CommentManager` にシェア用コメント候補オブジェクト `{ comment: string, score: number } | null` フィールドを追加する
+- [x] 1.2 `startGame()` で候補を `null` にリセットする処理を追加する
+- [x] 1.3 `spawnComment()` で感動スコア（0〜100 のランダム整数）を生成し、保存済みスコアより高ければ候補を置き換える処理を追加する
+- [x] 1.4 `getShareComment(): string | null` ゲッターを追加する
 
 ## 2. シェア用ベース画像の配置
 

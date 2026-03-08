@@ -406,6 +406,7 @@ export class GameScene extends Phaser.Scene {
             collected: this.collectedCount,
             total: this.totalReceipts,
             difficultyId: this.difficulty.id,
+            shareComment: this.commentManager.getShareComment(),
           },
         }),
       );
@@ -427,6 +428,7 @@ export class GameScene extends Phaser.Scene {
             collected: this.collectedCount,
             total: this.totalReceipts,
             difficultyId: this.difficulty.id,
+            shareComment: this.commentManager.getShareComment(),
           },
         }),
       );
@@ -450,6 +452,7 @@ export class GameScene extends Phaser.Scene {
             collected: this.collectedCount,
             total: this.totalReceipts,
             difficultyId: this.difficulty.id,
+            shareComment: this.commentManager.getShareComment(),
           },
         }),
       );
