@@ -20,7 +20,7 @@ import { Receipt } from "../objects/Receipt";
 import { Enemy } from "../objects/Enemy";
 import { HUD } from "../ui/HUD";
 import { AssetKeys } from "../assets/AssetKeys";
-import { CommentManager } from "../systems/CommentManager";
+import { CommentManager, CROSSING_DURATION } from "../systems/CommentManager";
 
 /** ゲームプレイゾーン内の画面幅（ロジック用） */
 const GAME_W = CANVAS_W;
@@ -413,7 +413,7 @@ export class GameScene extends Phaser.Scene {
     });
     // リザルト画面表示から約5秒後に新規投入を停止し、さらに CROSSING_DURATION(3500ms) 後に表示も停止する
     this.time.delayedCall(7000, () => { this.commentManager.stopSpawning(); });
-    this.time.delayedCall(10500, () => { this.commentManager.setEnabled(false); });
+    this.time.delayedCall(7000 + CROSSING_DURATION, () => { this.commentManager.setEnabled(false); });
   }
 
   private onScrollOverrun(): void {
@@ -438,7 +438,7 @@ export class GameScene extends Phaser.Scene {
     });
     // リザルト画面表示から約5秒後に新規投入を停止し、さらに CROSSING_DURATION(3500ms) 後に表示も停止する
     this.time.delayedCall(7000, () => { this.commentManager.stopSpawning(); });
-    this.time.delayedCall(10500, () => { this.commentManager.setEnabled(false); });
+    this.time.delayedCall(7000 + CROSSING_DURATION, () => { this.commentManager.setEnabled(false); });
   }
 
   private onGoalReached(): void {
@@ -466,7 +466,7 @@ export class GameScene extends Phaser.Scene {
     // リザルト画面表示から約5秒後にコメントループを停止する
     // リザルト画面表示から約5秒後に新規投入を停止し、さらに CROSSING_DURATION(3500ms) 後に表示も停止する
     this.time.delayedCall(8000, () => { this.commentManager.stopSpawning(); });
-    this.time.delayedCall(11500, () => { this.commentManager.setEnabled(false); });
+    this.time.delayedCall(8000 + CROSSING_DURATION, () => { this.commentManager.setEnabled(false); });
   }
 
   // -------------------------------------------------

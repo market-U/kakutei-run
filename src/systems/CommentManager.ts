@@ -96,7 +96,7 @@ export async function loadCommentsData(): Promise<void> {
 }
 
 /** 全コメントが画面を横断するのにかかる時間（ms） */
-const CROSSING_DURATION = 3500;
+export const CROSSING_DURATION = 3500;
 
 /** レーンの Y 座標一覧（画面全体、60px 間隔） */
 const LANE_Y_POSITIONS = [25, 80, 135, 190, 245, 300, 355, 410, 475];
