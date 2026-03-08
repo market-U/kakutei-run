@@ -48,3 +48,8 @@ window.addEventListener("kakutei:retryGame", (e) => {
   const difficulty = getDifficultyById(difficultyId);
   game.scene.start("GameScene", { difficulty });
 });
+
+// 長押し選択禁止
+document.onselectstart = function() {
+  return false;
+}
