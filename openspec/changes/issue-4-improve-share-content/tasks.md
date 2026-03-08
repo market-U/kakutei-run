@@ -9,27 +9,27 @@
 
 ## 2. シェア用ベース画像の配置
 
-- [ ] 2.1 クリア用ベース画像 `share_clear.png`（1080×1080px）を `public/assets/ui/` に配置する
-- [ ] 2.2 ゲームオーバー用ベース画像 `share_gameover.png`（1080×1080px）を `public/assets/ui/` に配置する
+- [x] 2.1 クリア用ベース画像 `share_clear.png`（1080×1080px）を `public/assets/ui/` に配置する
+- [x] 2.2 ゲームオーバー用ベース画像 `share_gameover.png`（1080×1080px）を `public/assets/ui/` に配置する
 
 ## 3. Canvas API によるシェア用画像生成
 
-- [ ] 3.1 `ResultUI.ts` に `shareImagePromise: Promise<File | null> | null` フィールドを追加する
-- [ ] 3.2 `generateShareImage()` メソッドを追加し、結果に応じたベース画像をロードして Canvas に描画する
-- [ ] 3.3 難易度名を画像上部にオーバーレイするテキスト描画を実装する
-- [ ] 3.4 レシート取得率・シェア用コメント・バージョンを画像下部にオーバーレイするテキスト描画を実装する
-- [ ] 3.5 `canvas.toBlob()` で画像を `File` オブジェクトに変換する処理を実装する
-- [ ] 3.6 `show()` 内でリザルト画面表示と同時に `generateShareImage()` を呼び出し、`shareImagePromise` に保持する
+- [x] 3.1 `ResultUI.ts` に `shareImagePromise: Promise<File | null> | null` フィールドを追加する
+- [x] 3.2 `generateShareImage()` メソッドを追加し、結果に応じたベース画像をロードして Canvas に描画する
+- [x] 3.3 難易度名を画像上部にオーバーレイするテキスト描画を実装する
+- [x] 3.4 レシート取得率・シェア用コメント・バージョンを画像下部にオーバーレイするテキスト描画を実装する
+- [x] 3.5 `canvas.toBlob()` で画像を `File` オブジェクトに変換する処理を実装する
+- [x] 3.6 `show()` 内でリザルト画面表示と同時に `generateShareImage()` を呼び出し、`shareImagePromise` に保持する
 
 ## 4. doShare() の改修
 
-- [ ] 4.1 `doShare()` の先頭にシェア内容の編集箇所であることを示すコメントを追加する
-- [ ] 4.2 `doShare()` 冒頭で `await this.shareImagePromise` し、画像生成完了を待ってからシェアする（生成中に押された場合も自然に待機、ハングなし）
-- [ ] 4.3 シェアテキストのフレーズをクリア / ゲームオーバーで切り替える形式（`<難易度名> 確定成功！` / `<難易度名> 確定ならず…`）に変更する
-- [ ] 4.4 スコアのラベルを `レシート取得率: xx%` に変更する
-- [ ] 4.5 アプリバージョン（`__APP_VERSION__`）と URL（`window.location.href`）をシェアテキストに追加する
-- [ ] 4.6 ハッシュタグを `#確定RUN` に変更する
-- [ ] 4.7 `navigator.canShare({ files: [...] })` で判定し、対応環境では画像付き `navigator.share()` を、非対応環境ではテキストのみの Twitter URL を開くフォールバックを実装する
+- [x] 4.1 `doShare()` の先頭にシェア内容の編集箇所であることを示すコメントを追加する
+- [x] 4.2 `doShare()` 冒頭で `await this.shareImagePromise` し、画像生成完了を待ってからシェアする（生成中に押された場合も自然に待機、ハングなし）
+- [x] 4.3 シェアテキストのフレーズをクリア / ゲームオーバーで切り替える形式（`<難易度名> 確定成功！` / `<難易度名> 確定ならず…`）に変更する
+- [x] 4.4 スコアのラベルを `レシート取得率: xx%` に変更する
+- [x] 4.5 アプリバージョン（`__APP_VERSION__`）と URL（`window.location.href`）をシェアテキストに追加する
+- [x] 4.6 ハッシュタグを `#確定RUN` に変更する
+- [x] 4.7 `navigator.canShare({ files: [...] })` で判定し、対応環境では画像付き `navigator.share()` を、非対応環境ではテキストのみの Twitter URL を開くフォールバックを実装する
 
 ## 5. 動作確認
 
