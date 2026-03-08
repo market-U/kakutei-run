@@ -411,6 +411,8 @@ export class GameScene extends Phaser.Scene {
         }),
       );
     });
+    // リザルト画面表示から約5秒後にコメントループを停止する
+    this.time.delayedCall(7000, () => { this.commentManager.setEnabled(false); });
   }
 
   private onScrollOverrun(): void {
@@ -433,6 +435,8 @@ export class GameScene extends Phaser.Scene {
         }),
       );
     });
+    // リザルト画面表示から約5秒後にコメントループを停止する
+    this.time.delayedCall(7000, () => { this.commentManager.setEnabled(false); });
   }
 
   private onGoalReached(): void {
@@ -457,6 +461,8 @@ export class GameScene extends Phaser.Scene {
         }),
       );
     });
+    // リザルト画面表示から約5秒後にコメントループを停止する
+    this.time.delayedCall(8000, () => { this.commentManager.setEnabled(false); });
   }
 
   // -------------------------------------------------
