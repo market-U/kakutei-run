@@ -160,7 +160,7 @@ export class ResultUI {
       return await new Promise<File | null>((resolve) => {
         canvas.toBlob((blob) => {
           if (!blob) { resolve(null); return; }
-          resolve(new File([blob], "kakutei-run-result.png", { type: "image/png" }));
+          resolve(new File([blob], "kakutei-run-result.png", { type: "text/plain" })); // typeにtextを指定するのはAndroidでFileとtextを同時共有できない問題のWA
         }, "image/png");
       });
     } catch {
