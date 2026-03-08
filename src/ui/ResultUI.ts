@@ -107,6 +107,7 @@ export class ResultUI {
         image.onerror = reject;
         image.src = basePath;
       });
+      await document.fonts.ready; // 全フォント読み込み完了を待つ
 
       const canvas = document.createElement("canvas");
       canvas.width = SIZE;
@@ -117,13 +118,13 @@ export class ResultUI {
       ctx.drawImage(img, 0, 0, SIZE, SIZE);
 
       // 難易度名を上部に描画
-      ctx.font = "bold 56px sans-serif";
-      ctx.fillStyle = "#ffffff";
-      ctx.strokeStyle = "#000000";
+      ctx.font = "bold 96px 'LINE Seed J', sans-serif";
+      ctx.fillStyle = isClear ? "#df6868" : "#bdd5db";
+      // ctx.strokeStyle = "#000000";
       ctx.lineWidth = 6;
-      ctx.textAlign = "left";
-      ctx.strokeText(difficultyName, 48, 88);
-      ctx.fillText(difficultyName, 48, 88);
+      ctx.textAlign = "center";
+      // ctx.strokeText(difficultyName, SIZE / 2, 160);
+      ctx.fillText(difficultyName, SIZE / 2, 160);
 
       // スコア・コメント・バージョンを下部に描画
       const bottomY = SIZE - 48;
@@ -131,21 +132,29 @@ export class ResultUI {
       // バージョン
       ctx.font = "36px sans-serif";
       ctx.textAlign = "right";
-      ctx.strokeText(`v${__APP_VERSION__}`, SIZE - 48, bottomY);
-      ctx.fillText(`v${__APP_VERSION__}`, SIZE - 48, bottomY);
+      ctx.fillStyle = isClear ? "#3b3b3b" : "#bdd5db";
+      // ctx.strokeText(`v${__APP_VERSION__}`, SIZE - 48, bottomY);
+      ctx.fillText(`#確定RUN v${__APP_VERSION__}`, SIZE - 48, bottomY);
 
       // スコア
-      ctx.font = "bold 60px sans-serif";
-      ctx.textAlign = "left";
+      ctx.font = "bold 48px 'LINE Seed J', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillStyle = isClear ? "#3b3b3b" : "#bdd5db";
       const scoreText = `レシート取得率: ${score}%`;
-      ctx.strokeText(scoreText, 48, bottomY - 120);
-      ctx.fillText(scoreText, 48, bottomY - 120);
+      // ctx.strokeText(scoreText, SIZE / 2, bottomY - 200);
+      ctx.fillText(scoreText, SIZE / 2, 240);
 
       // コメント
       if (shareComment) {
-        ctx.font = "italic 44px sans-serif";
-        ctx.strokeText(`「${shareComment}」`, 48, bottomY - 56);
-        ctx.fillText(`「${shareComment}」`, 48, bottomY - 56);
+        ctx.font = "40px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = isClear ? "#3b3b3b" : "#bdd5db";
+        ctx.fillText(`<心に残ったコメント>`, SIZE / 2, bottomY - 150);
+
+        ctx.font = "italic bold 44px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = isClear ? "#000000" : "#ffffff";
+        ctx.fillText(`「${shareComment}」`, SIZE / 2, bottomY - 80);
       }
 
       return await new Promise<File | null>((resolve) => {
