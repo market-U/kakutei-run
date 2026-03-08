@@ -20,7 +20,7 @@ import { Receipt } from "../objects/Receipt";
 import { Enemy } from "../objects/Enemy";
 import { HUD } from "../ui/HUD";
 import { AssetKeys } from "../assets/AssetKeys";
-import { CommentManager } from "../systems/CommentManager";
+import { CommentManager, CROSSING_DURATION } from "../systems/CommentManager";
 
 /** ゲームプレイゾーン内の画面幅（ロジック用） */
 const GAME_W = CANVAS_W;
@@ -406,10 +406,14 @@ export class GameScene extends Phaser.Scene {
             collected: this.collectedCount,
             total: this.totalReceipts,
             difficultyId: this.difficulty.id,
+            shareComment: this.commentManager.getShareComment(),
           },
         }),
       );
     });
+    // リザルト画面表示から約5秒後に新規投入を停止し、さらに CROSSING_DURATION(3500ms) 後に表示も停止する
+    this.time.delayedCall(7000, () => { this.commentManager.stopSpawning(); });
+    this.time.delayedCall(7000 + CROSSING_DURATION, () => { this.commentManager.setEnabled(false); });
   }
 
   private onScrollOverrun(): void {
@@ -427,10 +431,14 @@ export class GameScene extends Phaser.Scene {
             collected: this.collectedCount,
             total: this.totalReceipts,
             difficultyId: this.difficulty.id,
+            shareComment: this.commentManager.getShareComment(),
           },
         }),
       );
     });
+    // リザルト画面表示から約5秒後に新規投入を停止し、さらに CROSSING_DURATION(3500ms) 後に表示も停止する
+    this.time.delayedCall(7000, () => { this.commentManager.stopSpawning(); });
+    this.time.delayedCall(7000 + CROSSING_DURATION, () => { this.commentManager.setEnabled(false); });
   }
 
   private onGoalReached(): void {
@@ -450,10 +458,15 @@ export class GameScene extends Phaser.Scene {
             collected: this.collectedCount,
             total: this.totalReceipts,
             difficultyId: this.difficulty.id,
+            shareComment: this.commentManager.getShareComment(),
           },
         }),
       );
     });
+    // リザルト画面表示から約5秒後にコメントループを停止する
+    // リザルト画面表示から約5秒後に新規投入を停止し、さらに CROSSING_DURATION(3500ms) 後に表示も停止する
+    this.time.delayedCall(8000, () => { this.commentManager.stopSpawning(); });
+    this.time.delayedCall(8000 + CROSSING_DURATION, () => { this.commentManager.setEnabled(false); });
   }
 
   // -------------------------------------------------

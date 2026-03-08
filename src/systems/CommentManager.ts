@@ -96,7 +96,7 @@ export async function loadCommentsData(): Promise<void> {
 }
 
 /** 全コメントが画面を横断するのにかかる時間（ms） */
-const CROSSING_DURATION = 3500;
+export const CROSSING_DURATION = 3500;
 
 /** レーンの Y 座標一覧（画面全体、60px 間隔） */
 const LANE_Y_POSITIONS = [25, 80, 135, 190, 245, 300, 355, 410, 475];
@@ -169,6 +169,9 @@ export class CommentManager {
   /** ループバーストの1バッチあたりの投入数 */
   private burstLoopCount = 0;
 
+  /** シェア用コメント候補（感動スコアで更新される） */
+  private shareCommentCandidate: { comment: string; score: number } | null = null;
+
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.data = window.__commentsData ?? FALLBACK_COMMENTS;
@@ -186,6 +189,8 @@ export class CommentManager {
   startGame(difficultyId: string): void {
     const diffComments = this.data.difficulty[difficultyId] ?? [];
     this.activePool = [...this.data.common, ...diffComments];
+    // シェア用コメント候補をリセット
+    this.shareCommentCandidate = null;
     // 最初のコメントをすぐ出す
     this.spawnTimer = 300;
     // スタート応援バーストを投入
@@ -285,6 +290,18 @@ export class CommentManager {
   }
 
   /**
+   * 新規コメントの投入を停止する。
+   * 画面上を流れ中のコメントはそのまま表示し続ける。
+   * CROSSING_DURATION 後に setEnabled(false) を呼ぶと自然にフェードアウトできる。
+   */
+  stopSpawning(): void {
+    this.burstLoopType = null;
+    this.burstQueue = [];
+    // Infinity にすることで spawnTimer -= delta が永遠に 0 以下にならない
+    this.spawnTimer = Infinity;
+  }
+
+  /**
    * コメント表示の ON/OFF を切り替える。
    */
   setEnabled(enabled: boolean): void {
@@ -312,6 +329,11 @@ export class CommentManager {
     return this.enabled;
   }
 
+  /** シェア用コメント候補を返す。候補がなければ null を返す。 */
+  getShareComment(): string | null {
+    return this.shareCommentCandidate?.comment ?? null;
+  }
+
   // -------------------------------------------------
   // private
   // -------------------------------------------------
@@ -325,6 +347,12 @@ export class CommentManager {
   private spawnComment(commentText: string): void {
     const laneIndex = this.selectLane();
     if (laneIndex === -1) return; // 全レーン混雑
+
+    // 感動スコアで候補を更新
+    const score = Math.floor(Math.random() * 101);
+    if (this.shareCommentCandidate === null || score > this.shareCommentCandidate.score) {
+      this.shareCommentCandidate = { comment: commentText, score };
+    }
 
     const y = LANE_Y_POSITIONS[laneIndex];
     const textObj = this.scene.add

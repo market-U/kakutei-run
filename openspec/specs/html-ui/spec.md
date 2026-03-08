@@ -103,13 +103,30 @@
 
 - **WHEN** `kakutei:gameResult` イベントを受信する
 - **THEN** HTML リザルト画面が表示される
-- **AND** 結果（クリア / ゲームオーバー）・レシート回収率・SNSシェアボタン・リトライボタンが HTML 要素として描画される
+- **AND** 結果（クリア / ゲームオーバー）・レシート取得率・SNSシェアボタン・リトライボタンが HTML 要素として描画される
 
-### Scenario: SNS シェア
+### Scenario: SNS シェア（画像あり）
 
 - **WHEN** ユーザーがシェアボタンを押す
-- **THEN** Web Share API が使用可能な場合は `navigator.share()` を呼び出す
-- **AND** Web Share API が非対応の場合は Twitter 投稿 URL を新規タブで開く
+- **AND** `navigator.canShare({ files: [...] })` が `true` を返す
+- **THEN** Canvas API で生成した 1080×1080px の画像ファイルと本文テキスト（URL + `#確定RUN`）を `navigator.share()` に渡して共有する
+
+### Scenario: SNS シェア（画像非対応環境のフォールバック）
+
+- **WHEN** ユーザーがシェアボタンを押す
+- **AND** `navigator.canShare({ files: [...] })` が `false` を返すまたは `navigator.share` が存在しない
+- **THEN** テキストのみの Twitter intent URL を新規タブで開く
+- **AND** テキストには難易度フレーズ・レシート取得率・バージョン・URL・`#確定RUN` を含める
+
+### Scenario: シェアテキストのフレーズ（クリア時）
+
+- **WHEN** クリア結果でシェアが実行される
+- **THEN** テキストの先頭フレーズは `<難易度名> 確定成功！` となる
+
+### Scenario: シェアテキストのフレーズ（ゲームオーバー時）
+
+- **WHEN** ゲームオーバー結果でシェアが実行される
+- **THEN** テキストの先頭フレーズは `<難易度名> 確定ならず…` となる
 
 ### Scenario: リトライ
 
