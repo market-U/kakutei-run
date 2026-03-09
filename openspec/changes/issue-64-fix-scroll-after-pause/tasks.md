@@ -2,7 +2,7 @@
 
 ## 1. バグ修正
 
-- [ ] 1.1 `GameScene.resume()` 内で `this.scrollManager.resume()` を呼び出す
+- [x] 1.1 `GameScene.resume()` 内で `this.scrollManager.resume()` を呼び出す
 
 ## 2. 動作確認
 

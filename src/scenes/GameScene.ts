@@ -492,6 +492,7 @@ export class GameScene extends Phaser.Scene {
     if (this.state !== "paused") return;
     document.getElementById("pause-overlay")!.classList.remove("visible");
     this.state = this.stateBeforePause;
+    this.scrollManager.resume();
     if (
       this.state === "playing" ||
       this.state === "back_pain_slow" ||
