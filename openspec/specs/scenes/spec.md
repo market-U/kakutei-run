@@ -30,7 +30,7 @@
 |---|---|---|---|
 | `kakutei:assetsLoaded` | BootScene | TitleUI | なし |
 | `kakutei:startGame` | TitleUI | main.ts | `{ difficultyId }` |
-| `kakutei:gameResult` | GameScene | ResultUI | `{ result, collected, total, difficultyId }` |
+| `kakutei:gameResult` | GameScene | ResultUI | `{ result, collected, total, difficultyId, shareComment, distance }` |
 | `kakutei:retryGame` | ResultUI | main.ts | `{ difficultyId }` |
 | `kakutei:orientationChanged` | OrientationManager | GameScene | `{ orientation }` |
 
@@ -47,12 +47,12 @@
 ### Scenario: リザルト画面の表示
 
 - **WHEN** `kakutei:gameResult` イベントが発火する
-- **THEN** `#result-screen` が表示され、結果・レシート回収率・SNSシェアボタン・リトライボタンが表示される
+- **THEN** `#result-screen` が表示され、結果・レシート回収率・走行距離・SNSシェアボタン・リトライボタンが表示される
 
 ### Scenario: 難易度を変えてリトライ
 
 - **WHEN** プレーヤーがリトライボタンから難易度を選択してリトライする
-- **THEN** `kakutei:retryGame` イベントが発火し、選択した難易度で GameScene が再起動する
+- **THEN** `kakutei:retryGame` イベントが `{ difficultyId }` とともに発火し、GameScene が指定難易度で再起動する
 
 ---
 
