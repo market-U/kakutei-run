@@ -19,9 +19,38 @@
     <div id="game-container" class="w-full h-full"></div>
 
     <!-- HUD オーバーレイ（ゲームプレイ中のみ表示） -->
-    <div id="hud-overlay" class="hidden fixed top-0 left-0 right-0 px-4 py-2.5 justify-between items-center pointer-events-none z-10">
-      <span id="hud-receipts" class="text-white text-lg [text-shadow:0_0_4px_#000,0_0_4px_#000]">レシート: 0 / 0</span>
-      <span id="hud-distance" class="text-white text-lg [text-shadow:0_0_4px_#000,0_0_4px_#000]">距離: 0m</span>
+    <div id="hud-overlay" class="hidden fixed inset-0 flex flex-col pointer-events-none z-10">
+      <!-- 上スペーサー: キャンバス上端までの余白 -->
+      <div id="hud-top" style="height: var(--canvas-top, 0px); flex-shrink: 0;"></div>
+      <!-- 中段: キャンバスと同じ高さ。HUD 情報・ボタンを配置 -->
+      <div id="hud-middle" class="flex flex-col justify-between overflow-hidden" style="height: var(--canvas-height, 100%);">
+        <div class="flex justify-between items-center px-4 py-2">
+          <div class="flex gap-4">
+            <span id="hud-receipts" class="text-white text-lg [text-shadow:0_0_4px_#000,0_0_4px_#000]">レシート: 0 / 0</span>
+            <span id="hud-distance" class="text-white text-lg [text-shadow:0_0_4px_#000,0_0_4px_#000]">距離: 0m</span>
+          </div>
+          <div class="flex gap-2 pointer-events-auto">
+            <button
+              id="comment-toggle-btn"
+              title="コメント表示切替"
+              class="hidden w-10 h-10 bg-black/50 text-white border border-white/30 rounded-lg text-lg items-center justify-center"
+            >💬</button>
+            <button
+              id="pause-btn"
+              title="ポーズ"
+              class="hidden w-10 h-10 bg-black/50 text-white border border-white/30 rounded-lg text-lg items-center justify-center"
+            >⏸</button>
+          </div>
+        </div>
+        <!-- 横画面用操作方法テキスト（縦画面では非表示） -->
+        <div class="hidden landscape:flex justify-end px-4 pb-2">
+          <span class="text-white text-sm bg-black/50 border border-white/20 rounded-lg px-3 py-1 [text-shadow:0_0_4px_#000]">タップ・スペース: ジャンプ｜レシートを集めてゴールを目指せ！</span>
+        </div>
+      </div>
+      <!-- 下段: キャンバス下端より下の余白。縦画面のみ表示 -->
+      <div id="hud-bottom" class="flex-1 overflow-hidden flex items-start px-4 pt-2 landscape:hidden">
+        <span class="text-white text-sm bg-black/50 border border-white/20 rounded-lg px-3 py-1 [text-shadow:0_0_4px_#000]">タップ・スペース: ジャンプ｜レシートを集めてゴールを目指せ！</span>
+      </div>
     </div>
 
     <!-- タイトル画面 -->
@@ -79,19 +108,6 @@
       </div>
     </div>
 
-    <!-- コメントトグルボタン（ゲームプレイ中のみ表示） -->
-    <button
-      id="comment-toggle-btn"
-      title="コメント表示切替"
-      class="hidden fixed top-2 right-14 w-10 h-10 bg-black/50 text-white border border-white/30 rounded-lg text-lg z-[200] items-center justify-center"
-    >💬</button>
-
-    <!-- ポーズボタン（ゲームプレイ中のみ表示） -->
-    <button
-      id="pause-btn"
-      title="ポーズ"
-      class="hidden fixed top-2 right-2 w-10 h-10 bg-black/50 text-white border border-white/30 rounded-lg text-lg z-[200] items-center justify-center"
-    >⏸</button>
 
     <!-- ポーズオーバーレイ -->
     <div id="pause-overlay" class="hidden fixed inset-0 bg-black/70 flex-col justify-center items-center gap-4 z-[150] cursor-pointer">
