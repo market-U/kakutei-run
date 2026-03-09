@@ -188,8 +188,9 @@ export class ResultUI {
       phrase,
       `レシート取得率: ${score}%`,
       ``,
-      `v${__APP_VERSION__} | ${window.location.href}`,
+      `${window.location.href}`,
       `#確定RUN`,
+      `v${__APP_VERSION__}`
     ].join("\n");
 
     // 画像生成が完了するまで待機（生成中にボタンを押された場合も自然に待つ）
