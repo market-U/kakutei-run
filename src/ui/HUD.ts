@@ -2,6 +2,7 @@
 export class HUD {
   private receiptsEl: HTMLElement;
   private distanceEl: HTMLElement;
+  private difficultyEl: HTMLElement;
   private commentToggleBtn: HTMLElement;
   private canvasObserver: ResizeObserver;
   private hintFadeTimer: ReturnType<typeof setTimeout> | null = null;
@@ -9,12 +10,14 @@ export class HUD {
   private collectedCount = 0;
   private totalCount = 0;
   private distance = 0;
+  private difficultyName = "LV1";
 
   constructor(_scene: unknown, totalReceipts: number) {
     this.totalCount = totalReceipts;
 
     this.receiptsEl = document.getElementById("hud-receipts-value")!;
     this.distanceEl = document.getElementById("hud-distance-value")!;
+    this.difficultyEl = document.getElementById("hud-difficulty-value")!;
     this.commentToggleBtn = document.getElementById("comment-toggle-btn")!;
 
     // キャンバス位置をCSS変数に反映するObserverを設定
@@ -63,6 +66,11 @@ export class HUD {
   setDistance(px: number): void {
     this.distance = px;
     this.refresh();
+  }
+
+  setDifficulty(name: string): void {
+    this.difficultyName = name;
+    this.difficultyEl.textContent = `${this.difficultyName}`;
   }
 
   setCommentEnabled(enabled: boolean): void {

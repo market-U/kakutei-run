@@ -180,6 +180,7 @@ export class GameScene extends Phaser.Scene {
 
     // --- HUD ---
     this.hud = new HUD(this, this.totalReceipts);
+    this.hud.setDifficulty(this.difficulty.displayName);
 
     // --- CollisionManager ---
     this.collision = new CollisionManager(this, this.player, this.enemy);

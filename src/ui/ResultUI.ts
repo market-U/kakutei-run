@@ -158,7 +158,7 @@ export class ResultUI {
         ctx.font = "40px sans-serif";
         ctx.textAlign = "center";
         ctx.fillStyle = isClear ? "#3b3b3b" : "#bdd5db";
-        ctx.fillText(`<心に残ったコメント>`, SIZE / 2, bottomY - 150);
+        ctx.fillText(`<白ちゃんの心に残ったコメント>`, SIZE / 2, bottomY - 150);
 
         ctx.font = "italic bold 44px sans-serif";
         ctx.textAlign = "center";
