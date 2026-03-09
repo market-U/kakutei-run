@@ -4,6 +4,7 @@ export class HUD {
   private distanceEl: HTMLElement;
   private commentToggleBtn: HTMLElement;
   private canvasObserver: ResizeObserver;
+  private hintFadeTimer: ReturnType<typeof setTimeout> | null = null;
 
   private collectedCount = 0;
   private totalCount = 0;
@@ -12,8 +13,8 @@ export class HUD {
   constructor(_scene: unknown, totalReceipts: number) {
     this.totalCount = totalReceipts;
 
-    this.receiptsEl = document.getElementById("hud-receipts")!;
-    this.distanceEl = document.getElementById("hud-distance")!;
+    this.receiptsEl = document.getElementById("hud-receipts-value")!;
+    this.distanceEl = document.getElementById("hud-distance-value")!;
     this.commentToggleBtn = document.getElementById("comment-toggle-btn")!;
 
     // キャンバス位置をCSS変数に反映するObserverを設定
@@ -33,6 +34,15 @@ export class HUD {
     document.getElementById("hud-overlay")!.classList.add("visible");
     document.getElementById("pause-btn")!.classList.add("visible");
     this.commentToggleBtn.classList.add("visible");
+
+    // 横画面ヒントを5秒後にフェードアウト
+    const hintEl = document.getElementById("hud-hint-landscape");
+    if (hintEl) {
+      this.hintFadeTimer = setTimeout(() => {
+        hintEl.style.opacity = "0";
+        this.hintFadeTimer = null;
+      }, 5000);
+    }
 
     this.refresh();
   }
@@ -60,6 +70,10 @@ export class HUD {
   }
 
   destroy(): void {
+    if (this.hintFadeTimer !== null) {
+      clearTimeout(this.hintFadeTimer);
+      this.hintFadeTimer = null;
+    }
     this.canvasObserver.disconnect();
     document.getElementById("hud-overlay")!.classList.remove("visible");
     document.getElementById("pause-btn")!.classList.remove("visible");
@@ -67,7 +81,7 @@ export class HUD {
   }
 
   private refresh(): void {
-    this.receiptsEl.textContent = `レシート: ${this.collectedCount} / ${this.totalCount}`;
-    this.distanceEl.textContent = `距離: ${Math.floor(this.distance)}m`;
+    this.receiptsEl.textContent = `${this.collectedCount} / ${this.totalCount}`;
+    this.distanceEl.textContent = `${Math.floor(this.distance)}m`;
   }
 }

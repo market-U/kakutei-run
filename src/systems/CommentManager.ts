@@ -105,8 +105,8 @@ const LANE_Y_POSITIONS = [25, 80, 135, 190, 245, 300, 355, 410, 475];
 const LANE_FREE_THRESHOLD = 0.3;
 
 /** 通常スポーン間隔（ms） */
-const SPAWN_INTERVAL_MIN = 2000;
-const SPAWN_INTERVAL_MAX = 3500;
+const SPAWN_INTERVAL_MIN = 500;
+const SPAWN_INTERVAL_MAX = 2200;
 
 /** バーストコメント間の投入間隔（ms） */
 const BURST_INTERVAL_MIN = 200;

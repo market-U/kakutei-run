@@ -26,30 +26,36 @@
       <div id="hud-middle" class="flex flex-col justify-between overflow-hidden" style="height: var(--canvas-height, 100%);">
         <div class="flex justify-between items-center px-4 py-2">
           <div class="flex gap-4">
-            <span id="hud-receipts" class="text-white text-lg [text-shadow:0_0_4px_#000,0_0_4px_#000]">レシート: 0 / 0</span>
-            <span id="hud-distance" class="text-white text-lg [text-shadow:0_0_4px_#000,0_0_4px_#000]">距離: 0m</span>
+            <span id="hud-receipts" class="text-white text-md [text-shadow:0_0_3px_#000,0_0_3px_#000]">
+              <i class="fa-solid fa-receipt"></i>
+              <span id="hud-receipts-value" >0 / 0</span>
+            </span>
+            <span id="hud-distance" class="text-white text-md [text-shadow:0_0_3px_#000,0_0_3px_#000]">
+              <i class="fa-solid fa-road"></i>
+              <span id="hud-distance-value">0m</span>
+            </span>
           </div>
           <div class="flex gap-2 pointer-events-auto">
             <button
               id="comment-toggle-btn"
               title="コメント表示切替"
               class="hidden w-10 h-10 bg-black/50 text-white border border-white/30 rounded-lg text-lg items-center justify-center"
-            >💬</button>
+            ><i class="fa-regular fa-comment"></i></button>
             <button
               id="pause-btn"
               title="ポーズ"
               class="hidden w-10 h-10 bg-black/50 text-white border border-white/30 rounded-lg text-lg items-center justify-center"
-            >⏸</button>
+            ><i class="fa-solid fa-pause"></i></button>
           </div>
         </div>
-        <!-- 横画面用操作方法テキスト（縦画面では非表示） -->
-        <div class="hidden landscape:flex justify-end px-4 pb-2">
-          <span class="text-white text-sm bg-black/50 border border-white/20 rounded-lg px-3 py-1 [text-shadow:0_0_4px_#000]">タップ・スペース: ジャンプ｜レシートを集めてゴールを目指せ！</span>
+        <!-- 横画面用操作方法テキスト（縦画面では非表示・5秒後にフェードアウト） -->
+        <div id="hud-hint-landscape" class="hidden landscape:flex justify-end px-4 pb-2" style="transition: opacity 1s ease-out;">
+          <span class="text-white text-sm bg-black/50 border border-white/20 rounded-lg px-3 py-1 [text-shadow:0_0_3px_#000]">経費のレシートを集めて税務署まで走り抜けろ！ロングタップで高く跳べるぞ！</span>
         </div>
       </div>
       <!-- 下段: キャンバス下端より下の余白。縦画面のみ表示 -->
       <div id="hud-bottom" class="flex-1 overflow-hidden flex items-start px-4 pt-2 landscape:hidden">
-        <span class="text-white text-sm bg-black/50 border border-white/20 rounded-lg px-3 py-1 [text-shadow:0_0_4px_#000]">タップ・スペース: ジャンプ｜レシートを集めてゴールを目指せ！</span>
+        <span class="text-white text-sm bg-black/50 border border-white/20 rounded-lg px-3 py-1 [text-shadow:0_0_3px_#000]">経費のレシートを集めて税務署まで走り抜けろ！ロングタップで高く跳べるぞ！</span>
       </div>
     </div>
 
