@@ -2,13 +2,13 @@
 
 ## 1. GameScene のイベント payload に distance を追加
 
-- [ ] 1.1 `src/scenes/GameScene.ts` の `onEnemyCaught`・`onScrollOverrun`・`onGoalReached` それぞれの `kakutei:gameResult` 発火箇所に `distance: Math.floor(this.scrolledX / 10)` を追加する
+- [x] 1.1 `src/scenes/GameScene.ts` の `onEnemyCaught`・`onScrollOverrun`・`onGoalReached` それぞれの `kakutei:gameResult` 発火箇所に `distance: Math.floor(this.scrolledX / 10)` を追加する
 
 ## 2. ResultUI の型・データフローを更新
 
-- [ ] 2.1 `src/ui/ResultUI.ts` の `ResultDetail` インターフェースに `distance: number` フィールドを追加する
-- [ ] 2.2 `show` メソッドのデストラクチャリングに `distance` を追加し、`generateShareImage` へ渡す
-- [ ] 2.3 `generateShareImage` のシグネチャに `distance: number` を追加し、Canvas 画像に走行距離を描画する（配置・スタイルは開発者にて調整）
+- [x] 2.1 `src/ui/ResultUI.ts` の `ResultDetail` インターフェースに `distance: number` フィールドを追加する
+- [x] 2.2 `show` メソッドのデストラクチャリングに `distance` を追加し、`generateShareImage` へ渡す
+- [x] 2.3 `generateShareImage` のシグネチャに `distance: number` を追加し、Canvas 画像に走行距離を描画する（配置・スタイルは開発者にて調整）
 
 ## 3. Result 画面 HTML への走行距離表示（開発者にて実施）
 

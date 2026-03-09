@@ -9,6 +9,7 @@ interface ResultDetail {
   total: number;
   difficultyId: string;
   shareComment: string | null;
+  distance: number;
 }
 
 /** リザルト画面のHTML UI管理クラス */
@@ -28,7 +29,7 @@ export class ResultUI {
   }
 
   private show(detail: ResultDetail): void {
-    const { result, collected, total, difficultyId, shareComment } = detail;
+    const { result, collected, total, difficultyId, shareComment, distance } = detail;
     const isClear = result === "clear";
     const score = total > 0 ? Math.floor((collected / total) * 100) : 0;
 
@@ -57,7 +58,7 @@ export class ResultUI {
 
     // リザルト画面表示と同時に画像生成を開始し Promise を保持する。
     // シェアボタンを即押しされても await で自然に待機できる。
-    this.shareImagePromise = this.generateShareImage(isClear, score, difficulty.displayName, shareComment);
+    this.shareImagePromise = this.generateShareImage(isClear, score, difficulty.displayName, shareComment, distance);
 
     const retryContainer = document.getElementById("retry-buttons")!;
     new DifficultyButtons(retryContainer, (selectedDifficultyId) => {
@@ -94,6 +95,7 @@ export class ResultUI {
     score: number,
     difficultyName: string,
     shareComment: string | null,
+    distance: number,
   ): Promise<File | null> {
     try {
       const SIZE = 1080;
@@ -143,6 +145,12 @@ export class ResultUI {
       const scoreText = `レシート取得率: ${score}%`;
       // ctx.strokeText(scoreText, SIZE / 2, bottomY - 200);
       ctx.fillText(scoreText, SIZE / 2, 240);
+
+      // 走行距離
+      ctx.font = "bold 48px 'LINE Seed J', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillStyle = isClear ? "#3b3b3b" : "#bdd5db";
+      ctx.fillText(`走行距離: ${distance}m`, SIZE / 2, 300);
 
       // コメント
       if (shareComment) {
