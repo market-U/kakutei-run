@@ -12,6 +12,6 @@
 
 ## 3. Result 画面 HTML への走行距離表示（開発者にて実施）
 
-- [ ] 3.1 `index.html` の Result 画面に走行距離表示用の HTML 要素を追加する
-- [ ] 3.2 `src/ui/ResultUI.ts` の `show` メソッドで走行距離要素にテキストをセットする
-- [ ] 3.3 走行距離要素のスタイル（CSS）を調整する
+- [x] 3.1 `index.html` の Result 画面に走行距離表示用の HTML 要素を追加する
+- [x] 3.2 `src/ui/ResultUI.ts` の `show` メソッドで走行距離要素にテキストをセットする
+- [x] 3.3 走行距離要素のスタイル（CSS）を調整する
