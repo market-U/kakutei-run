@@ -70,6 +70,12 @@ export class ResultUI {
       );
     });
 
+    const returnTitleBtn = document.getElementById("result-return-title-btn")!;
+    returnTitleBtn.onclick = () => {
+      this.hide();
+      window.dispatchEvent(new CustomEvent("kakutei:returnToTitle"));
+    };
+
     this.screen.classList.add("visible");
   }
 
