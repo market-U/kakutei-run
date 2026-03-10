@@ -27,7 +27,7 @@ import { EffectManager } from "../systems/EffectManager";
 const GAME_W = CANVAS_W;
 
 /** Enemy 到達時にランダム表示するメッセージ一覧 */
-const ENEMY_REACHED_TEXTS = ["申告は正確に", "3月15日です", "追徴課税です", "税務調査入ります", "もっと早く準備を始めましょう"];
+const ENEMY_REACHED_TEXTS = ["申告は正確に", "3月16日です", "追徴課税です", "税務調査入ります", "もっと早く準備を始めましょう"];
 /** ゲームプレイゾーンの高さ（ロジック用） */
 const GAME_H = GAME_ZONE_HEIGHT;
 /** プレーヤーの固定 X 位置 */
