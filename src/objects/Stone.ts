@@ -45,12 +45,21 @@ export class Stone extends Phaser.GameObjects.Image {
       // 落下アニメーションをつける場合はここで実装
         this.scene.tweens.add({
         targets: this,
-        y: this.y + 64,
-        // alpha: 0,
-        duration: 500,
-        ease: "Cubic.easeIn",
+        y: this.y - 12,
+        angle: 30,
+        duration: 80,
+        ease: "Cubic.easeOut",
         onComplete: () => {
-          this.destroy();
+          this.scene.tweens.add({
+            targets: this,
+            y: this.y + 128,
+            angle: 120,
+            duration: 800,
+            ease: "Cubic.easeIn",
+            onComplete: () => {
+              this.destroy();
+            }
+          });
         }
       });
     }

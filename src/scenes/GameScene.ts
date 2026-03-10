@@ -27,7 +27,7 @@ import { EffectManager } from "../systems/EffectManager";
 const GAME_W = CANVAS_W;
 
 /** Enemy 到達時にランダム表示するメッセージ一覧 */
-const ENEMY_REACHED_TEXTS = ["申告は正確に", "3月15日です", "追徴課税です"];
+const ENEMY_REACHED_TEXTS = ["申告は正確に", "3月15日です", "追徴課税です", "税務調査入ります", "もっと早く準備を始めましょう"];
 /** ゲームプレイゾーンの高さ（ロジック用） */
 const GAME_H = GAME_ZONE_HEIGHT;
 /** プレーヤーの固定 X 位置 */
@@ -412,8 +412,10 @@ export class GameScene extends Phaser.Scene {
     this.hud.setCollectedCount(this.collectedCount);
     this.effectManager.spawnFloatingText({
       x: data.x,
-      y: data.y,
+      y: data.y - 48,
       text: "+1",
+      sizePx: 32,
+      color: "#ee4697",
       followScroll: true,
     });
   }
@@ -425,10 +427,12 @@ export class GameScene extends Phaser.Scene {
     this.enemy.stopChasing();
     this.commentManager.startLoopBurst("stumble", 6);
     this.player.triggerEnemyCaught();
-    this.effectManager.spawnFloatingText({
+    this.effectManager.spawnText({
       x: PLAYER_SCREEN_X,
       y: SCREEN_GROUND_Y - 120,
       text: Phaser.Math.RND.pick(ENEMY_REACHED_TEXTS),
+      sizePx: 28,
+      color: "#000",
       followScroll: false,
     });
     this.time.delayedCall(2000, () => {
@@ -547,37 +551,64 @@ export class GameScene extends Phaser.Scene {
     const { width } = this.scale;
 
     // 「確定！！」テキスト — ゲームプレイゾーン中央に表示
-    const gameZoneCenterY = GAME_ZONE_Y + GAME_ZONE_HEIGHT / 2;
+    const textPosition = {
+      x: this.player.x,
+      y: this.player.y - 220,
+    };
     const clearText = this.add
-      .text(width / 2, gameZoneCenterY - 40, "確定！！", {
-        fontSize: "80px",
-        color: "#ffee00",
-        fontFamily: "sans-serif",
-        stroke: "#cc6600",
-        strokeThickness: 6,
+      .text(textPosition.x, textPosition.y , "確定!", {
+        fontSize: "120px",
+        fontStyle: "bold",
+        color: "#f5e618",
+        fontFamily: "LINE Seed JP, sans-serif",
+        stroke: "#b0252c",
+        strokeThickness: 8,
       })
       .setOrigin(0.5)
       .setDepth(30)
       .setScale(0);
     this.tweens.add({
       targets: clearText,
-      scaleX: 1,
-      scaleY: 1,
-      duration: 600,
-      ease: "Elastic.Out",
-      easeParams: [1.2, 0.5],
+      scaleX: 1.2,
+      scaleY: 1.2,
+      angle: -10,
+      duration: 800,
+      onComplete: () => {
+        this.tweens.add({
+          targets: clearText,
+          scaleX: 1.0,
+          scaleY: 1.0,
+          duration: 400,
+          ease: "Sine.InOut",
+          easeParams: [1.2, 0.5],
+          yoyo: true,
+          loop: -1,
+          onComplete: () => {
+            clearText.destroy();
+          },
+        });
+      }
     });
 
     // 紙吹雪パーティクル — ゲームプレイゾーン内で降らせる
-    const colors = [0xff0000, 0x00ff00, 0x0088ff, 0xffee00, 0xff88ff];
-    const particles = this.add.particles(0, 0, "__DEFAULT", {
+    if (!this.textures.exists("confetti")) {
+      const g = this.make.graphics();
+      g.fillStyle(0xffffff, 1);
+      g.fillRect(0, 0, 10, 16);
+      g.generateTexture("confetti", 10, 16);
+      g.destroy();
+    }
+    // colorsStr = ["#f87a7a", "#c2ff90", "#78d7ff", "#eae451", "#f5ac52"];
+    const colors = [0xf87a7a, 0xc2ff90, 0x78d7ff, 0xeae451, 0xf5ac52];
+    const particles = this.add.particles(0, 0, "confetti", {
       x: { min: 0, max: width },
       y: GAME_ZONE_Y - 20,
       speedY: { min: 100, max: 300 },
       speedX: { min: -60, max: 60 },
       lifespan: 3000,
       quantity: 4,
-      scale: { start: 0.3, end: 0.1 },
+      scale: { start: 1, end: 0.3 },
+      rotate: { min: -180, max: 180 },
       tint: colors,
       frequency: 50,
     });
