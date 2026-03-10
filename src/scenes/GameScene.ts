@@ -81,6 +81,12 @@ export class GameScene extends Phaser.Scene {
   // 腰痛スロータイマー（石ころ被弾時にキャンセルするために保持）
   private backPainTimer: Phaser.Time.TimerEvent | null = null;
 
+  // ゲーム終了後の各種 delayedCall（SHUTDOWN 時にキャンセルするために保持）
+  private resultDispatchTimer: Phaser.Time.TimerEvent | null = null;
+  private commentStopSpawnTimer: Phaser.Time.TimerEvent | null = null;
+  private commentDisableTimer: Phaser.Time.TimerEvent | null = null;
+  private particlesCleanupTimer: Phaser.Time.TimerEvent | null = null;
+
   // ポーズ前の状態（再開時に復元）
   private stateBeforePause: GameState = "playing";
 
@@ -102,6 +108,11 @@ export class GameScene extends Phaser.Scene {
     this.scrolledX = 0;
     this.collectedCount = 0;
     this.state = "playing";
+    this.backPainTimer = null;
+    this.resultDispatchTimer = null;
+    this.commentStopSpawnTimer = null;
+    this.commentDisableTimer = null;
+    this.particlesCleanupTimer = null;
   }
 
   create(): void {
@@ -252,32 +263,35 @@ export class GameScene extends Phaser.Scene {
       .getElementById("comment-toggle-btn")!
       .addEventListener("click", this.onCommentToggleBtnClick);
 
-    // shutdown 時にリスナーを明示的にクリーンアップ
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.events.off("stoneHit", this.onStoneHit, this);
-      this.events.off("witchHit", this.onWitchHit, this);
-      this.events.off("receiptCollected", this.onReceiptCollected, this);
-      this.events.off("enemyReached", this.onEnemyReached, this);
-      document
-        .getElementById("pause-btn")
-        ?.removeEventListener("click", this.onPauseBtnClick);
-      window.removeEventListener(
-        "kakutei:orientationChanged",
-        this.onOrientationChanged,
-      );
-      document
-        .getElementById("pause-resume-btn")
-        ?.removeEventListener("click", this.onPauseResumeBtnClick);
-      document
-        .getElementById("pause-return-title-btn")
-        ?.removeEventListener("click", this.onPauseReturnTitleBtnClick);
-      document
-        .getElementById("comment-toggle-btn")
-        ?.removeEventListener("click", this.onCommentToggleBtnClick);
-      document.removeEventListener("pointerdown", this.onDocumentPointerDown);
-      document.removeEventListener("pointerup", this.onDocumentPointerUp);
-      this.commentManager.destroy();
-    });
+    // shutdown 時にリスナー・タイマー・オブジェクトをクリーンアップ
+    this.events.on(Phaser.Scenes.Events.SHUTDOWN, this.onShutdown, this);
+  }
+
+  private onShutdown(): void {
+    // シーンイベントのリスナー解除
+    this.events.off("stoneHit", this.onStoneHit, this);
+    this.events.off("witchHit", this.onWitchHit, this);
+    this.events.off("receiptCollected", this.onReceiptCollected, this);
+    this.events.off("enemyReached", this.onEnemyReached, this);
+    // player のカスタムイベントリスナー解除
+    this.player?.off("backPainActivated");
+    // DOM・window イベントリスナー解除
+    document.getElementById("pause-btn")?.removeEventListener("click", this.onPauseBtnClick);
+    window.removeEventListener("kakutei:orientationChanged", this.onOrientationChanged);
+    document.getElementById("pause-resume-btn")?.removeEventListener("click", this.onPauseResumeBtnClick);
+    document.getElementById("pause-return-title-btn")?.removeEventListener("click", this.onPauseReturnTitleBtnClick);
+    document.getElementById("comment-toggle-btn")?.removeEventListener("click", this.onCommentToggleBtnClick);
+    document.removeEventListener("pointerdown", this.onDocumentPointerDown);
+    document.removeEventListener("pointerup", this.onDocumentPointerUp);
+    // delayedCall タイマーをキャンセル
+    this.backPainTimer?.remove(false);
+    this.resultDispatchTimer?.remove(false);
+    this.commentStopSpawnTimer?.remove(false);
+    this.commentDisableTimer?.remove(false);
+    this.particlesCleanupTimer?.remove(false);
+    // コメント・エフェクトを一括破棄
+    this.commentManager?.shutdown();
+    this.effectManager?.destroy();
   }
 
   update(_time: number, delta: number): void {
@@ -435,7 +449,7 @@ export class GameScene extends Phaser.Scene {
       color: "#000",
       followScroll: false,
     });
-    this.time.delayedCall(2000, () => {
+    this.resultDispatchTimer = this.time.delayedCall(2000, () => {
       this.hud.destroy();
       window.dispatchEvent(
         new CustomEvent("kakutei:gameResult", {
@@ -451,8 +465,8 @@ export class GameScene extends Phaser.Scene {
       );
     });
     // リザルト画面表示から約5秒後に新規投入を停止し、さらに CROSSING_DURATION(3500ms) 後に表示も停止する
-    this.time.delayedCall(7000, () => { this.commentManager.stopSpawning(); });
-    this.time.delayedCall(7000 + CROSSING_DURATION, () => { this.commentManager.setEnabled(false); });
+    this.commentStopSpawnTimer = this.time.delayedCall(7000, () => { this.commentManager.stopSpawning(); });
+    this.commentDisableTimer = this.time.delayedCall(7000 + CROSSING_DURATION, () => { this.commentManager.setEnabled(false); });
   }
 
   private onScrollOverrun(): void {
@@ -461,7 +475,7 @@ export class GameScene extends Phaser.Scene {
     this.scrollManager.stop();
     this.enemy.stopChasing();
     this.commentManager.startLoopBurst("stumble", 6);
-    this.time.delayedCall(2000, () => {
+    this.resultDispatchTimer = this.time.delayedCall(2000, () => {
       this.hud.destroy();
       window.dispatchEvent(
         new CustomEvent("kakutei:gameResult", {
@@ -477,8 +491,8 @@ export class GameScene extends Phaser.Scene {
       );
     });
     // リザルト画面表示から約5秒後に新規投入を停止し、さらに CROSSING_DURATION(3500ms) 後に表示も停止する
-    this.time.delayedCall(7000, () => { this.commentManager.stopSpawning(); });
-    this.time.delayedCall(7000 + CROSSING_DURATION, () => { this.commentManager.setEnabled(false); });
+    this.commentStopSpawnTimer = this.time.delayedCall(7000, () => { this.commentManager.stopSpawning(); });
+    this.commentDisableTimer = this.time.delayedCall(7000 + CROSSING_DURATION, () => { this.commentManager.setEnabled(false); });
   }
 
   private onGoalReached(): void {
@@ -489,7 +503,7 @@ export class GameScene extends Phaser.Scene {
     this.player.triggerGoal();
     this.showClearEffect();
 
-    this.time.delayedCall(3000, () => {
+    this.resultDispatchTimer = this.time.delayedCall(3000, () => {
       this.hud.destroy();
       window.dispatchEvent(
         new CustomEvent("kakutei:gameResult", {
@@ -504,10 +518,9 @@ export class GameScene extends Phaser.Scene {
         }),
       );
     });
-    // リザルト画面表示から約5秒後にコメントループを停止する
     // リザルト画面表示から約5秒後に新規投入を停止し、さらに CROSSING_DURATION(3500ms) 後に表示も停止する
-    this.time.delayedCall(8000, () => { this.commentManager.stopSpawning(); });
-    this.time.delayedCall(8000 + CROSSING_DURATION, () => { this.commentManager.setEnabled(false); });
+    this.commentStopSpawnTimer = this.time.delayedCall(8000, () => { this.commentManager.stopSpawning(); });
+    this.commentDisableTimer = this.time.delayedCall(8000 + CROSSING_DURATION, () => { this.commentManager.setEnabled(false); });
   }
 
   // -------------------------------------------------
@@ -553,7 +566,7 @@ export class GameScene extends Phaser.Scene {
     // 「確定！！」テキスト — ゲームプレイゾーン中央に表示
     const textPosition = {
       x: this.player.x,
-      y: this.player.y - 220,
+      y: this.player.y - 200,
     };
     const clearText = this.add
       .text(textPosition.x, textPosition.y , "確定!", {
@@ -566,15 +579,18 @@ export class GameScene extends Phaser.Scene {
       })
       .setOrigin(0.5)
       .setDepth(30)
-      .setScale(0);
-    this.tweens.add({
-      targets: clearText,
-      scaleX: 1.2,
-      scaleY: 1.2,
-      angle: -10,
-      duration: 800,
-      onComplete: () => {
-        this.tweens.add({
+      .setScale(0)
+      .setAngle(-10);
+
+    this.tweens.chain({
+      tweens: [
+        {
+          targets: clearText,
+          scaleX: 1.2,
+          scaleY: 1.2,
+          duration: 800
+        },
+        {
           targets: clearText,
           scaleX: 1.0,
           scaleY: 1.0,
@@ -582,13 +598,13 @@ export class GameScene extends Phaser.Scene {
           ease: "Sine.InOut",
           easeParams: [1.2, 0.5],
           yoyo: true,
-          loop: -1,
-          onComplete: () => {
-            clearText.destroy();
-          },
-        });
+          loop: -1
+        }
+      ],
+      onComplete: () => {
+        clearText.destroy();
       }
-    });
+    })
 
     // 紙吹雪パーティクル — ゲームプレイゾーン内で降らせる
     if (!this.textures.exists("confetti")) {
@@ -614,6 +630,6 @@ export class GameScene extends Phaser.Scene {
     });
     particles.setDepth(29);
 
-    this.time.delayedCall(3000, () => particles.destroy());
+    this.particlesCleanupTimer = this.time.delayedCall(3000, () => particles.destroy());
   }
 }

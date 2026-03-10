@@ -316,6 +316,15 @@ export class CommentManager {
     }
   }
 
+  /** シーン SHUTDOWN 時に呼ぶ。新規スポーンを止め、画面上のコメントをすべて破棄する。 */
+  shutdown(): void {
+    this.stopSpawning();
+    for (const c of this.activeComments) {
+      c.text.destroy();
+    }
+    this.activeComments = [];
+  }
+
   destroy(): void {
     for (const c of this.activeComments) {
       c.text.destroy();
