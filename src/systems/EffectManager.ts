@@ -132,6 +132,14 @@ export class EffectManager {
     });
   }
 
+  /** シーン SHUTDOWN 時にアクティブなエフェクトをすべて破棄する。 */
+  destroy(): void {
+    for (const effect of this.activeEffects) {
+      effect.text.destroy();
+    }
+    this.activeEffects = [];
+  }
+
   /** スクロール追従エフェクトの x 座標を補正する。毎フレーム呼ぶこと。 */
   update(scrollDelta: number): void {
     for (const effect of this.activeEffects) {
