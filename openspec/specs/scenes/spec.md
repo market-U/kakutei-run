@@ -32,6 +32,7 @@
 | `kakutei:startGame` | TitleUI | main.ts | `{ difficultyId }` |
 | `kakutei:gameResult` | GameScene | ResultUI | `{ result, collected, total, difficultyId, shareComment, distance }` |
 | `kakutei:retryGame` | ResultUI | main.ts | `{ difficultyId }` |
+| `kakutei:returnToTitle` | PauseUI / ResultUI | main.ts, TitleUI | なし |
 | `kakutei:orientationChanged` | OrientationManager | GameScene | `{ orientation }` |
 
 ### Scenario: タイトル画面の表示
@@ -47,7 +48,7 @@
 ### Scenario: リザルト画面の表示
 
 - **WHEN** `kakutei:gameResult` イベントが発火する
-- **THEN** `#result-screen` が表示され、結果・レシート回収率・走行距離・SNSシェアボタン・リトライボタンが表示される
+- **THEN** `#result-screen` が表示され、結果・レシート回収率・走行距離・SNSシェアボタン・リトライボタン・タイトルへ戻るボタンが表示される
 
 ### Scenario: 難易度を変えてリトライ
 
@@ -106,10 +107,15 @@
 - **WHEN** GameScene がアクティブ中に `kakutei:orientationChanged` イベントが発火する
 - **THEN** ゲームスクロールが一時停止し、`#pause-overlay` が表示される
 
-### Scenario: ポーズ解除
+### Scenario: ポーズ解除ボタンによる再開
 
-- **WHEN** ポーズ中にプレーヤーが `#pause-overlay` をタップする
+- **WHEN** ポーズ中にプレーヤーが「ゲームに戻る」ボタン（`#pause-resume-btn`）を押す
 - **THEN** ゲームスクロールが再開し、`#pause-overlay` が非表示になる
+
+### Scenario: オーバーレイ全体クリックによる再開の廃止
+
+- **WHEN** ポーズ中にプレーヤーが `#pause-overlay`（ボタン以外の領域）をタップする
+- **THEN** ゲームは再開しない
 
 ---
 
