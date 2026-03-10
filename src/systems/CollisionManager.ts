@@ -34,7 +34,7 @@ export class CollisionManager {
     for (const stone of stones) {
       if (stone.isConsumed()) continue;
       if (rectsOverlap(pb, stone.getHitBounds())) {
-        stone.consume();
+        stone.consume(false);
         this.player.triggerFall();
         this.scene.events.emit("stoneHit");
         return;

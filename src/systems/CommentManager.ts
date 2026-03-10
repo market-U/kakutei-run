@@ -360,7 +360,7 @@ export class CommentManager {
         fontFamily: "LINE Seed JP, sans-serif",
         fontStyle: "bold",
         fontSize: FONT_SIZE,
-        color: "#ffffff",
+        color: "#ffffffdd",
         shadow: {
           offsetX: 1,
           offsetY: 1,

@@ -41,9 +41,9 @@ export const gameConfig = {
 
   // ---- レシート 出現・移動 ----
   /** レシートのスクロール速度係数 最小値 */
-  receiptSpeedFactorMin: 0.9,
+  receiptSpeedFactorMin: 0.8,
   /** レシートのスクロール速度係数 最大値 */
-  receiptSpeedFactorMax: 1.1,
+  receiptSpeedFactorMax: 1.2,
   /** レシートの出現 Y 座標 最小値 (px) */
   receiptYMin: 100,
   /** レシートの出現 Y 座標 最大値 (px) */

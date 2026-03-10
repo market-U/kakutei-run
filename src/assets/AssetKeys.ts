@@ -41,5 +41,5 @@ export const FrameCount = {
   PLAYER_BACK_PAIN: 6,
   ENEMY_RUN: 6,
   WITCH_FLOAT: 4,
-  RECEIPT: 1,
+  RECEIPT: 6,
 } as const;
