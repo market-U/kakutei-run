@@ -61,7 +61,7 @@ export class CollisionManager {
       if (receipt.isCollected()) continue;
       if (rectsOverlap(pb, receipt.getHitBounds())) {
         receipt.collect();
-        this.scene.events.emit("receiptCollected");
+        this.scene.events.emit("receiptCollected", { x: receipt.x, y: receipt.y });
       }
     }
   }

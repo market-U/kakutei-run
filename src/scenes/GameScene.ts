@@ -21,9 +21,13 @@ import { Enemy } from "../objects/Enemy";
 import { HUD } from "../ui/HUD";
 import { AssetKeys } from "../assets/AssetKeys";
 import { CommentManager, CROSSING_DURATION } from "../systems/CommentManager";
+import { EffectManager } from "../systems/EffectManager";
 
 /** ゲームプレイゾーン内の画面幅（ロジック用） */
 const GAME_W = CANVAS_W;
+
+/** Enemy 到達時にランダム表示するメッセージ一覧 */
+const ENEMY_REACHED_TEXTS = ["申告は正確に", "3月15日です", "追徴課税です"];
 /** ゲームプレイゾーンの高さ（ロジック用） */
 const GAME_H = GAME_ZONE_HEIGHT;
 /** プレーヤーの固定 X 位置 */
@@ -57,6 +61,7 @@ export class GameScene extends Phaser.Scene {
   private hud!: HUD;
   private collision!: CollisionManager;
   private commentManager!: CommentManager;
+  private effectManager!: EffectManager;
 
   private stones: Stone[] = [];
   private witches: Witch[] = [];
@@ -186,6 +191,9 @@ export class GameScene extends Phaser.Scene {
     // --- CollisionManager ---
     this.collision = new CollisionManager(this, this.player, this.enemy);
 
+    // --- EffectManager ---
+    this.effectManager = new EffectManager(this);
+
     // --- CommentManager ---
     this.commentManager = new CommentManager(this);
     this.commentManager.startGame(this.difficulty.id);
@@ -298,6 +306,7 @@ export class GameScene extends Phaser.Scene {
       const dx = (speed * delta) / 1000;
       this.scrolledX += dx;
       this.scrollManager.update(delta);
+      this.effectManager.update(dx);
       for (const s of this.stones) s.updateScroll(this.scrolledX);
       for (const w of this.witches) w.updateScroll(this.scrolledX, speed, delta);
       for (const r of this.receipts) r.updateScroll(this.scrolledX, speed, delta);
@@ -312,6 +321,7 @@ export class GameScene extends Phaser.Scene {
     const dx = (speed * delta) / 1000;
     this.scrolledX += dx;
     this.scrollManager.update(delta);
+    this.effectManager.update(dx);
 
     // プレーヤー
     this.player.update();
@@ -397,9 +407,15 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private onReceiptCollected(): void {
+  private onReceiptCollected(data: { x: number; y: number }): void {
     this.collectedCount++;
     this.hud.setCollectedCount(this.collectedCount);
+    this.effectManager.spawnFloatingText({
+      x: data.x,
+      y: data.y,
+      text: "+1",
+      followScroll: true,
+    });
   }
 
   private onEnemyReached(): void {
@@ -409,6 +425,12 @@ export class GameScene extends Phaser.Scene {
     this.enemy.stopChasing();
     this.commentManager.startLoopBurst("stumble", 6);
     this.player.triggerEnemyCaught();
+    this.effectManager.spawnFloatingText({
+      x: PLAYER_SCREEN_X,
+      y: SCREEN_GROUND_Y - 120,
+      text: Phaser.Math.RND.pick(ENEMY_REACHED_TEXTS),
+      followScroll: false,
+    });
     this.time.delayedCall(2000, () => {
       this.hud.destroy();
       window.dispatchEvent(
@@ -526,7 +548,7 @@ export class GameScene extends Phaser.Scene {
 
     // 「確定！！」テキスト — ゲームプレイゾーン中央に表示
     const gameZoneCenterY = GAME_ZONE_Y + GAME_ZONE_HEIGHT / 2;
-    this.add
+    const clearText = this.add
       .text(width / 2, gameZoneCenterY - 40, "確定！！", {
         fontSize: "80px",
         color: "#ffee00",
@@ -535,7 +557,16 @@ export class GameScene extends Phaser.Scene {
         strokeThickness: 6,
       })
       .setOrigin(0.5)
-      .setDepth(30);
+      .setDepth(30)
+      .setScale(0);
+    this.tweens.add({
+      targets: clearText,
+      scaleX: 1,
+      scaleY: 1,
+      duration: 600,
+      ease: "Elastic.Out",
+      easeParams: [1.2, 0.5],
+    });
 
     // 紙吹雪パーティクル — ゲームプレイゾーン内で降らせる
     const colors = [0xff0000, 0x00ff00, 0x0088ff, 0xffee00, 0xff88ff];
