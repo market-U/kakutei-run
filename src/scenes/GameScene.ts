@@ -566,7 +566,7 @@ export class GameScene extends Phaser.Scene {
     // 「確定！！」テキスト — ゲームプレイゾーン中央に表示
     const textPosition = {
       x: this.player.x,
-      y: this.player.y - 220,
+      y: this.player.y - 200,
     };
     const clearText = this.add
       .text(textPosition.x, textPosition.y , "確定!", {
@@ -579,15 +579,18 @@ export class GameScene extends Phaser.Scene {
       })
       .setOrigin(0.5)
       .setDepth(30)
-      .setScale(0);
-    this.tweens.add({
-      targets: clearText,
-      scaleX: 1.2,
-      scaleY: 1.2,
-      angle: -10,
-      duration: 800,
-      onComplete: () => {
-        this.tweens.add({
+      .setScale(0)
+      .setAngle(-10);
+
+    this.tweens.chain({
+      tweens: [
+        {
+          targets: clearText,
+          scaleX: 1.2,
+          scaleY: 1.2,
+          duration: 800
+        },
+        {
           targets: clearText,
           scaleX: 1.0,
           scaleY: 1.0,
@@ -595,13 +598,13 @@ export class GameScene extends Phaser.Scene {
           ease: "Sine.InOut",
           easeParams: [1.2, 0.5],
           yoyo: true,
-          loop: -1,
-          onComplete: () => {
-            clearText.destroy();
-          },
-        });
+          loop: -1
+        }
+      ],
+      onComplete: () => {
+        clearText.destroy();
       }
-    });
+    })
 
     // 紙吹雪パーティクル — ゲームプレイゾーン内で降らせる
     if (!this.textures.exists("confetti")) {

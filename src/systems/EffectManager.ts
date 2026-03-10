@@ -14,6 +14,7 @@ export class EffectManager {
 
   constructor(private readonly scene: Phaser.Scene) {}
 
+  // 表示後上に浮き上がりながらフェードアウトするテキストエフェクトをスポーンする
   spawnFloatingText({
     x,
     y,
@@ -45,34 +46,33 @@ export class EffectManager {
     const effect: FloatingEffect = { text: textObj, followScroll };
     this.activeEffects.push(effect);
 
-    // ボヨヨ〜ン出現
-    this.scene.tweens.add({
-      targets: textObj,
-      scaleX: 1,
-      scaleY: 1,
-      duration: 200,
-      // ease: "Elastic.Out",
-      // easeParams: [1.5, 0.5],
-      onComplete: () => {
-        // 上昇しながらフェードアウト
-        this.scene.tweens.add({
+    this.scene.tweens.chain({
+      tweens: [
+        {
+          targets: textObj,
+          scaleX: 1,
+          scaleY: 1,
+          duration: 200,
+        },
+        {
           targets: textObj,
           y: textObj.y - 80,
           alpha: 0,
           duration: 800,
           ease: "Linear",
-          onComplete: () => {
-            textObj.destroy();
-            this.activeEffects = this.activeEffects.filter(
-              (e) => e.text !== textObj,
-            );
-          },
-        });
+        }
+      ],
+      onComplete: () => {
+        textObj.destroy();
+        this.activeEffects = this.activeEffects.filter(
+          (e) => e.text !== textObj,
+        );
       },
     });
   }
 
-    spawnText({
+  // 表示後上に浮き上がりながらフェードアウトするテキストエフェクトをスポーンする
+  spawnText({
     x,
     y,
     text,
@@ -103,31 +103,30 @@ export class EffectManager {
     this.activeEffects.push(effect);
 
     // ボヨヨ〜ン出現
-    this.scene.tweens.add({
-      targets: textObj,
-      scaleX: 1,
-      scaleY: 1,
-      duration: 200,
-      // ease: "Bounce.InOut",
-      // easeParams: [1.5, 0.2],
-      // loop: -1,
-      onComplete: () => {
-        // 上昇しながらフェードアウト
-        this.scene.tweens.add({
+    textObj.setAngle(10);
+    this.scene.tweens.chain({
+      tweens: [
+        {
           targets: textObj,
           scaleX: 1.1,
           scaleY: 1.1,
+          duration: 200,
+        },
+        {
+          targets: textObj,
+          scaleX: 1.0,
+          scaleY: 1.0,
           duration: 500,
           ease: "Sine.InOut",
           yoyo: true,
           loop: -1,
-          onComplete: () => {
-            textObj.destroy();
-            this.activeEffects = this.activeEffects.filter(
-              (e) => e.text !== textObj,
-            );
-          },
-        });
+        }
+      ],
+      onComplete: () => {
+        textObj.destroy();
+        this.activeEffects = this.activeEffects.filter(
+          (e) => e.text !== textObj,
+        );
       },
     });
   }

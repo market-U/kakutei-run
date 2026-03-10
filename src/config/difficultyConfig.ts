@@ -40,10 +40,10 @@ export const difficulties: DifficultyEntry[] = [
     id: "hard",
     displayName: "LV3 青色申告",
     receiptCount: 25,
-    stoneFrequency: 2.5,
+    stoneFrequency: 2.1,
     witchFrequency: 1,
     scrollSpeed: 360,
-    stageLength: 10000,
+    stageLength: 11000,
   },
 ];
 
