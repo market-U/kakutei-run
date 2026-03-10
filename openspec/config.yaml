@@ -100,8 +100,13 @@ git_workflow:
              **Python の `json.dump` で JSON ファイルを生成し `gh api --input` で渡す**方式を使うこと。
              zsh のヒアドキュメント・グロブ展開を完全に迂回できる。
            - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する（Unicode 特殊記号は問題ない）
-           - **手順**（Python スクリプトとして一括実行すること）:
+           - **手順**（`python3 -c "..."` は zsh が `>` をリダイレクトと解釈して失敗するため使用禁止。
+             Python スクリプトを一時ファイルに書き出し `python3` で実行し、完了後に必ず削除すること）:
              ```python
+             # 1. 以下の内容を一時ファイル（例: /tmp/create_pr.py）に書き出す
+             # 2. python3 /tmp/create_pr.py で実行する
+             # 3. 成功・失敗問わず rm -f /tmp/create_pr.py で削除する
+
              import json, subprocess, tempfile, os, textwrap
 
              repo = subprocess.check_output(
