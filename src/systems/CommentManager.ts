@@ -358,7 +358,7 @@ export class CommentManager {
     const textObj = this.scene.add
       .text(CANVAS_W + 20, y, commentText, {
         fontFamily: "LINE Seed JP, sans-serif",
-        fontStyle: "bold",
+        fontStyle: "normal",
         fontSize: FONT_SIZE,
         color: "#ffffffdd",
         shadow: {
