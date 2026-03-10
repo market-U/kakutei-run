@@ -82,7 +82,8 @@ export class GameScene extends Phaser.Scene {
   // window イベントのクリーンアップ用参照
   private onOrientationChanged!: () => void;
   private onPauseBtnClick!: () => void;
-  private onPauseOverlayClick!: () => void;
+  private onPauseResumeBtnClick!: () => void;
+  private onPauseReturnTitleBtnClick!: () => void;
   private onCommentToggleBtnClick!: () => void;
   private onDocumentPointerDown!: (e: PointerEvent) => void;
   private onDocumentPointerUp!: () => void;
@@ -219,7 +220,11 @@ export class GameScene extends Phaser.Scene {
     // --- ポーズ・コメントトグル関連の window イベントリスナー ---
     this.onPauseBtnClick = () => this.pause();
     this.onOrientationChanged = () => this.pause();
-    this.onPauseOverlayClick = () => this.resume();
+    this.onPauseResumeBtnClick = () => this.resume();
+    this.onPauseReturnTitleBtnClick = () => {
+      document.getElementById("pause-overlay")!.classList.remove("visible");
+      window.dispatchEvent(new CustomEvent("kakutei:returnToTitle"));
+    };
     this.onCommentToggleBtnClick = () => {
       this.commentManager.setEnabled(!this.commentManager.isEnabled);
       this.hud.setCommentEnabled(this.commentManager.isEnabled);
@@ -230,8 +235,11 @@ export class GameScene extends Phaser.Scene {
       .addEventListener("click", this.onPauseBtnClick);
     window.addEventListener("kakutei:orientationChanged", this.onOrientationChanged);
     document
-      .getElementById("pause-overlay")!
-      .addEventListener("click", this.onPauseOverlayClick);
+      .getElementById("pause-resume-btn")!
+      .addEventListener("click", this.onPauseResumeBtnClick);
+    document
+      .getElementById("pause-return-title-btn")!
+      .addEventListener("click", this.onPauseReturnTitleBtnClick);
     document
       .getElementById("comment-toggle-btn")!
       .addEventListener("click", this.onCommentToggleBtnClick);
@@ -250,8 +258,11 @@ export class GameScene extends Phaser.Scene {
         this.onOrientationChanged,
       );
       document
-        .getElementById("pause-overlay")
-        ?.removeEventListener("click", this.onPauseOverlayClick);
+        .getElementById("pause-resume-btn")
+        ?.removeEventListener("click", this.onPauseResumeBtnClick);
+      document
+        .getElementById("pause-return-title-btn")
+        ?.removeEventListener("click", this.onPauseReturnTitleBtnClick);
       document
         .getElementById("comment-toggle-btn")
         ?.removeEventListener("click", this.onCommentToggleBtnClick);

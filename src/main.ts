@@ -49,6 +49,11 @@ window.addEventListener("kakutei:retryGame", (e) => {
   game.scene.start("GameScene", { difficulty });
 });
 
+// タイトルへ戻る
+window.addEventListener("kakutei:returnToTitle", () => {
+  game.scene.stop("GameScene");
+});
+
 // 長押し選択禁止
 document.onselectstart = function() {
   return false;

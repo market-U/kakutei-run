@@ -14,6 +14,7 @@ export class TitleUI {
     if (versionEl) versionEl.textContent = `v${__APP_VERSION__}`;
 
     window.addEventListener("kakutei:assetsLoaded", () => void this.show());
+    window.addEventListener("kakutei:returnToTitle", () => void this.show());
   }
 
   private async show(): Promise<void> {

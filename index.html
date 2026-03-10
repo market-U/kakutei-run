@@ -113,6 +113,7 @@
           <div class="flex flex-col items-center justify-center gap-4 landscape:flex-3 min-w-[240px]">
             <p class="text-white/70 text-base text-center">リトライ</p>
             <div id="retry-buttons" class="flex flex-col gap-3 items-center w-full max-w-xs"></div>
+            <button id="result-return-title-btn" class="btn btn-outline text-white/70 border-white/30 hover:bg-white/20 hover:border-white/60 w-full max-w-xs">タイトルへ戻る</button>
           </div>
         </div>
       </div>
@@ -120,9 +121,10 @@
 
 
     <!-- ポーズオーバーレイ -->
-    <div id="pause-overlay" class="hidden fixed inset-0 bg-black/70 flex-col justify-center items-center gap-4 z-[150] cursor-pointer">
+    <div id="pause-overlay" class="hidden fixed inset-0 bg-black/70 flex-col justify-center items-center gap-4 z-[150]">
       <p class="text-5xl text-white">⏸ PAUSE</p>
-      <small class="text-lg text-white/70">タップして再開</small>
+      <button id="pause-resume-btn" class="btn bg-teal-400 hover:bg-teal-300 text-white border-none w-48">ゲームに戻る</button>
+      <button id="pause-return-title-btn" class="btn btn-outline text-white border-white/50 hover:bg-white/20 hover:border-white w-48">タイトルへ戻る</button>
     </div>
 
     <script type="module" src="/src/main.ts"></script>
