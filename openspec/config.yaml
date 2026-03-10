@@ -102,24 +102,25 @@ git_workflow:
            - タイトル: change の proposal.md の内容をもとに日本語で簡潔に記述する（Unicode 特殊記号は問題ない）
            - **手順**（Python スクリプトとして一括実行すること）:
              ```python
-             import json, subprocess, tempfile, os
+             import json, subprocess, tempfile, os, textwrap
 
              repo = subprocess.check_output(
                  ['gh', 'repo', 'view', '--json', 'nameWithOwner', '--jq', '.nameWithOwner']
              ).decode().strip()
 
              pr_title = "タイトル"
-             pr_body = """## 概要
+             pr_body = textwrap.dedent("""
+                 ## 概要
 
-（概要テキスト）
+                 （概要テキスト）
 
-Closes #<N>
+                 Closes #<N>
 
-## 主な変更内容
+                 ## 主な変更内容
 
-- 変更1
-- 変更2
-"""
+                 - 変更1
+                 - 変更2
+             """).lstrip()
              # Issue番号がない場合は Closes #... 行を省略する
 
              payload = {
