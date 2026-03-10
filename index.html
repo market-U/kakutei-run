@@ -69,6 +69,7 @@
         <div class="flex flex-col landscape:flex-row items-center justify-center gap-3 px-6 py-8 landscape:py-4 landscape:gap-2 min-h-full w-full">
           <!-- 左カラム：ロゴエリア -->
           <div class="flex flex-col items-center justify-center landscape:flex-4 min-w-[320px]">
+            <span class="text-black/70 text-sm line-seed-jp-regular">確定申告応援ゲーム</span>
             <img
               id="title-logo"
               src="/assets/ui/title-logo.png"
@@ -111,9 +112,9 @@
           </div>
           <!-- 右カラム：リトライエリア -->
           <div class="flex flex-col items-center justify-center gap-4 landscape:flex-3 min-w-[240px]">
-            <p class="text-white/70 text-base text-center">リトライ</p>
+            <p class="text-white/70 text-base text-center">↓もういちどあそぶ↓</p>
             <div id="retry-buttons" class="flex flex-col gap-3 items-center w-full max-w-xs"></div>
-            <button id="result-return-title-btn" class="btn btn-outline text-white/70 border-white/30 hover:bg-white/20 hover:border-white/60 w-full max-w-xs">タイトルへ戻る</button>
+            <button id="result-return-title-btn" class="btn btn-outline text-white/70 border-white/30 hover:bg-white/20 hover:border-white/60 w-full max-w-xs"><i class="fa-solid fa-house"></i>タイトルへ戻る</button>
           </div>
         </div>
       </div>
@@ -123,8 +124,8 @@
     <!-- ポーズオーバーレイ -->
     <div id="pause-overlay" class="hidden fixed inset-0 bg-black/70 flex-col justify-center items-center gap-4 z-[150]">
       <p class="text-5xl text-white">⏸ PAUSE</p>
-      <button id="pause-resume-btn" class="btn bg-teal-400 hover:bg-teal-300 text-white border-none w-48">ゲームに戻る</button>
-      <button id="pause-return-title-btn" class="btn btn-outline text-white border-white/50 hover:bg-white/20 hover:border-white w-48">タイトルへ戻る</button>
+      <button id="pause-resume-btn" class="btn bg-teal-400 hover:bg-teal-300 text-white border-none w-48"><i class="fa-solid fa-play"></i>ゲーム再開</button>
+      <button id="pause-return-title-btn" class="btn btn-outline text-white border-white/50 hover:bg-white/20 hover:border-white w-48"><i class="fa-solid fa-house"></i>タイトルへ戻る</button>
     </div>
 
     <script type="module" src="/src/main.ts"></script>
