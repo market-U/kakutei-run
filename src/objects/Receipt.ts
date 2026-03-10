@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { AssetKeys } from "../assets/AssetKeys";
+import { AssetKeys, FrameCount } from "../assets/AssetKeys";
 import { gameConfig } from "../config/gameConfig";
 import { ScrollableSprite } from "./ScrollableSprite";
 
@@ -20,6 +20,9 @@ export class Receipt extends ScrollableSprite {
 
     scene.add.existing(this);
     this.setDepth(5);
+    this.createAnim(scene);
+    this.play("receipt_float");
+
   }
 
   isVisible(): boolean {
@@ -34,6 +37,20 @@ export class Receipt extends ScrollableSprite {
 
   isCollected(): boolean {
     return this._collected;
+  }
+
+  private createAnim(scene: Phaser.Scene): void {
+    if (!scene.anims.exists("receipt_float")) {
+      scene.anims.create({
+        key: "receipt_float",
+        frames: scene.anims.generateFrameNumbers(AssetKeys.RECEIPT, {
+          start: 0,
+          end: FrameCount.RECEIPT - 1,
+        }),
+        frameRate: 6,
+        repeat: -1,
+      });
+    }
   }
 
   getHitBounds(): Phaser.Geom.Rectangle {
