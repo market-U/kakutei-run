@@ -37,9 +37,34 @@ export class Stone extends Phaser.GameObjects.Image {
     return this.x > -100 && this.x < 1060;
   }
 
-  consume(): void {
+  consume(hide: boolean = true): void {
     this._consumed = true;
-    this.setVisible(false);
+    if (hide) {
+      this.setVisible(false);
+    } else {
+      // 落下アニメーション: chain でフラットに記述しシーン切り替え時も安全にクリーンアップされる
+      this.scene.tweens.chain({
+        tweens: [
+          {
+            targets: this,
+            y: this.y - 12,
+            angle: 30,
+            duration: 80,
+            ease: "Cubic.easeOut",
+          },
+          {
+            targets: this,
+            y: "+=128",
+            angle: 120,
+            duration: 800,
+            ease: "Cubic.easeIn",
+          },
+        ],
+        onComplete: () => {
+          this.destroy();
+        },
+      });
+    }
   }
 
   isConsumed(): boolean {

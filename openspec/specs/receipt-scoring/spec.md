@@ -16,8 +16,9 @@
 
 ### Scenario: レシートの移動速度
 
-- **WHEN** レシートが存在する
-- **THEN** そのレシートは地面スクロール速度の `receiptSpeedFactorMin`〜`receiptSpeedFactorMax` 倍のランダム速度で移動する
+- **WHEN** レシートが画面にフレームインする（`isVisible()` が初めて true になる）
+- **THEN** そのレシートは地面スクロール速度の `receiptSpeedFactorMin`〜`receiptSpeedFactorMax` 倍のランダム速度でドリフトを開始する
+- **AND** フレームイン前はドリフトなしで通常スクロールに従う
 
 ### Scenario: レシートの出現高さ
 

@@ -82,7 +82,7 @@ export class MapGenerator {
   ): { x: number; y: number } | null {
     // ゲーム開始直後の画面（canvasWidth px 分）にオブジェクトが出ないよう minX を画面幅以上にする
     const minX = this.canvasWidth;
-    const maxX = this.difficulty.stageLength - 200;
+    const maxX = this.difficulty.stageLength - 600;
     const minDist = gameConfig.objectMinDistance;
 
     for (let attempt = 0; attempt < 100; attempt++) {

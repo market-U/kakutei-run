@@ -6,31 +6,142 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
-    <title>確定申告ラン</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        background: #000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100vw;
-        height: 100vh;
-        overflow: hidden;
-      }
-      #game-container canvas {
-        touch-action: none;
-        user-select: none;
-        -webkit-user-select: none;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="game-container"></div>
+    <title>確定RUN | 確定申告応援ゲーム</title>
+    <meta name="description" content="カクコさんに追いつかれる前に確定申告を終わらせろ！レシートを集めて税務署へ走る確定申告応援ランゲーム。白ちゃんを応援しながら、自分も申告しよう。" />
+    <!-- OGP -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yellow-plant-062effe00.4.azurestaticapps.net/" />
+    <meta property="og:title" content="確定RUN | 確定申告応援ゲーム" />
+    <meta property="og:description" content="カクコさんに追いつかれる前に確定申告を終わらせろ！レシートを集めて税務署へ走る確定申告応援ランゲーム。白ちゃんを応援しながら、自分も申告しよう。" />
+    <meta property="og:image" content="https://yellow-plant-062effe00.4.azurestaticapps.net/ogp.png" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="確定RUN | 確定申告応援ゲーム" />
+    <meta name="twitter:description" content="カクコさんに追いつかれる前に確定申告を終わらせろ！レシートを集めて税務署へ走る確定申告応援ランゲーム。白ちゃんを応援しながら、自分も申告しよう。" />
+    <meta name="twitter:image" content="https://yellow-plant-062effe00.4.azurestaticapps.net/ogp.png" />
+    <!-- ファビコン -->
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=LINE+Seed+JP:wght@400;700&family=M+PLUS+1p:wght@300;400&display=swap" rel="stylesheet">  <body class="bg-black flex justify-center items-center w-screen h-svh overflow-hidden">
+    <div id="game-container" class="w-full h-full"></div>
+
+    <!-- HUD オーバーレイ（ゲームプレイ中のみ表示） -->
+    <div id="hud-overlay" class="hidden fixed inset-0 flex flex-col pointer-events-none z-10">
+      <!-- 上スペーサー: キャンバス上端までの余白 -->
+      <div id="hud-top" style="height: calc(var(--canvas-top, 0px) - 64px); flex-shrink: 0; vertical-align: bottom;"></div>
+      <!-- 中段: キャンバスと同じ高さ。HUD 情報・ボタンを配置 -->
+      <div id="hud-middle" class="flex flex-col justify-between overflow-hidden" style="height: calc(var(--canvas-height, 100%) + 64px);">
+        <div class="flex justify-between items-center px-4 py-2">
+          <div class="flex flex-col gap-0">
+            <div class="flex justify-between items-top">
+              <span id="hud-difficulty" class="text-white text-md [text-shadow:0_0_3px_#000,0_0_3px_#000]">
+                <span id="hud-difficulty-value">LV1</span>
+              </span>
+            </div>
+            <div>
+              <span id="hud-receipts" class="text-white text-md [text-shadow:0_0_3px_#000,0_0_3px_#000]">
+                <i class="fa-solid fa-receipt"></i>
+                <span id="hud-receipts-value" >0 / 0</span>
+              </span>
+              <span id="hud-distance" class="text-white text-md [text-shadow:0_0_3px_#000,0_0_3px_#000]">
+                <i class="fa-solid fa-road"></i>
+                <span id="hud-distance-value">0m</span>
+              </span>
+            </div>
+          </div>
+          <div class="flex gap-2 pointer-events-auto">
+            <button
+              id="comment-toggle-btn"
+              title="コメント表示切替"
+              class="hidden w-10 h-10 bg-black/50 text-white border border-white/30 rounded-lg text-lg items-center justify-center"
+            ><i class="fa-regular fa-comment"></i></button>
+            <button
+              id="pause-btn"
+              title="ポーズ"
+              class="hidden w-10 h-10 bg-black/50 text-white border border-white/30 rounded-lg text-lg items-center justify-center"
+            ><i class="fa-solid fa-pause"></i></button>
+          </div>
+        </div>
+        <!-- 横画面用操作方法テキスト（縦画面では非表示・5秒後にフェードアウト） -->
+        <div id="hud-hint-landscape" class="hidden landscape:flex justify-end px-4 pb-2" style="transition: opacity 1s ease-out;">
+          <span class="text-white text-sm bg-black/50 border border-white/20 rounded-lg px-3 py-1 [text-shadow:0_0_3px_#000]">経費のレシートを集めて税務署まで走り抜けろ！ロングタップで高く跳べるぞ！</span>
+        </div>
+      </div>
+      <!-- 下段: キャンバス下端より下の余白。縦画面のみ表示 -->
+      <div id="hud-bottom" class="flex-1 overflow-hidden flex items-start px-4 pt-2 landscape:hidden">
+        <span class="text-white text-sm bg-black/50 border border-white/20 rounded-lg px-3 py-1 [text-shadow:0_0_3px_#000]">経費のレシートを集めて税務署まで走り抜けろ！ロングタップで高く跳べるぞ！</span>
+      </div>
+    </div>
+
+    <!-- タイトル画面 -->
+    <div id="title-screen" class="hidden fixed inset-0 bg-yellow-100/100 z-[100] overflow-y-auto justify-center">
+      <div class="flex flex-row">
+        <div class="flex flex-col landscape:flex-row items-center justify-center gap-3 px-6 py-8 landscape:py-4 landscape:gap-2 min-h-full w-full">
+          <!-- 左カラム：ロゴエリア -->
+          <div class="flex flex-col items-center justify-center landscape:flex-4 min-w-[320px]">
+            <span class="text-black/70 text-sm line-seed-jp-regular">確定申告応援ゲーム</span>
+            <img
+              id="title-logo"
+              src="/assets/ui/title-logo.png"
+              alt="確定RUN"
+              class="max-w-[320px] w-full"
+            />
+            <span id="app-version" class="text-md text-black/100 text-right"></span>
+          </div>
+          <!-- 右カラム：操作エリア -->
+          <div class="flex flex-col items-center justify-center gap-4 landscape:flex-3 min-w-[240px]">
+            <p class="hidden text-black text-base text-center"><i class="fa-solid fa-arrow-down"></i>スタート</p>
+            <div id="difficulty-buttons" class="flex flex-col gap-3 items-center w-full max-w-xs"></div>
+            <!-- <span id="title-hint" class="text-sm text-white/70 text-center">スペース or タップ: ジャンプ（長押しでチャージ）</span> -->
+            <img
+              id="kakuko"
+              src="/assets/ui/kakuko.png"
+              alt="カクコさん"
+              class="max-w-[320px] w-full"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- リザルト画面 -->
+    <div id="result-screen" class="hidden fixed inset-0 bg-zinc-700/85 z-[100] overflow-y-auto justify-center">
+      <div class="flex flex-row">
+        <div class="flex flex-col landscape:flex-row items-center justify-center gap-6 px-8 py-8 landscape:py-4 landscape:gap-2 min-h-full w-full">
+          <!-- 左カラム：結果エリア -->
+          <div class="flex flex-col items-center justify-center gap-3 landscape:flex-5 min-w-[320px]">
+            <div class="flex flex-col gap-0">
+              <div id="result-crown" class="hidden text-center"><i class="fa-solid fa-crown text-yellow-400/100"></i></div>
+              <div id="result-difficulty" class="text-2xl text-center [text-shadow:2px_2px_6px_#000]"></div>
+              <div id="result-title" class="text-5xl text-center [text-shadow:2px_2px_6px_#000]"></div>
+            </div>
+            <div id="result-score" class="text-2xl text-white text-center"></div>
+            <div id="result-count" class="hidden text-lg text-white/70 text-center"></div>
+            <button id="share-btn" class="btn bg-teal-400 hover:bg-teal-300 text-white border-none mt-2"><i class="fa-solid fa-share-nodes"></i>
+結果をシェア</button>
+          </div>
+          <!-- 右カラム：リトライエリア -->
+          <div class="flex flex-col items-center justify-center gap-4 landscape:flex-3 min-w-[240px]">
+            <p class="text-white/70 text-base text-center">↓もういちどあそぶ↓</p>
+            <div id="retry-buttons" class="flex flex-col gap-3 items-center w-full max-w-xs"></div>
+            <button id="result-return-title-btn" class="btn btn-outline text-white/70 border-white/30 hover:bg-white/20 hover:border-white/60 w-full max-w-xs"><i class="fa-solid fa-house"></i>タイトルへ戻る</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ポーズオーバーレイ -->
+    <div id="pause-overlay" class="hidden fixed inset-0 bg-black/70 flex-col justify-center items-center gap-4 z-[150]">
+      <p class="text-5xl text-white">⏸ PAUSE</p>
+      <button id="pause-resume-btn" class="btn bg-teal-400 hover:bg-teal-300 text-white border-none w-48"><i class="fa-solid fa-play"></i>ゲーム再開</button>
+      <button id="pause-return-title-btn" class="btn btn-outline text-white border-white/50 hover:bg-white/20 hover:border-white w-48"><i class="fa-solid fa-house"></i>タイトルへ戻る</button>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

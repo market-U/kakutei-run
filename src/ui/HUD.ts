@@ -1,38 +1,61 @@
-import Phaser from "phaser";
-
-/** ゲームプレイ中のHUD表示（UI上部ゾーンに配置） */
+/** ゲームプレイ中のHUD表示（HTMLオーバーレイ要素を更新） */
 export class HUD {
-  private receiptText: Phaser.GameObjects.Text;
-  private distanceText: Phaser.GameObjects.Text;
+  private receiptsEl: HTMLElement;
+  private distanceEl: HTMLElement;
+  private difficultyEl: HTMLElement;
+  private commentToggleBtn: HTMLElement;
+  private canvasObserver: ResizeObserver;
+  private hintFadeTimer: ReturnType<typeof setTimeout> | null = null;
 
   private collectedCount = 0;
   private totalCount = 0;
   private distance = 0;
+  private difficultyName = "LV1";
 
-  constructor(scene: Phaser.Scene, totalReceipts: number) {
+  constructor(_scene: unknown, totalReceipts: number) {
     this.totalCount = totalReceipts;
 
-    const style: Phaser.Types.GameObjects.Text.TextStyle = {
-      fontSize: "32px",
-      color: "#ffffff",
-      fontFamily: "sans-serif",
-      stroke: "#000000",
-      strokeThickness: 4,
-    };
+    this.receiptsEl = document.getElementById("hud-receipts-value")!;
+    this.distanceEl = document.getElementById("hud-distance-value")!;
+    this.difficultyEl = document.getElementById("hud-difficulty-value")!;
+    this.commentToggleBtn = document.getElementById("comment-toggle-btn")!;
 
-    // レシート収集数 — UI上部ゾーン内に配置
-    this.receiptText = scene.add
-      .text(40, 240, "", style)
-      .setScrollFactor(0)
-      .setDepth(20);
+    // キャンバス位置をCSS変数に反映するObserverを設定
+    const canvas = document.querySelector("canvas");
+    this.canvasObserver = new ResizeObserver(() => {
+      this.updateCanvasCssVars();
+    });
+    if (canvas) {
+      this.updateCanvasCssVars();
+      this.canvasObserver.observe(canvas);
+    } else {
+      // キャンバス未取得時はフォールバック値を設定
+      document.documentElement.style.setProperty("--canvas-top", "0px");
+      document.documentElement.style.setProperty("--canvas-height", "100%");
+    }
 
-    // 進行距離
-    this.distanceText = scene.add
-      .text(40, 290, "", style)
-      .setScrollFactor(0)
-      .setDepth(20);
+    document.getElementById("hud-overlay")!.classList.add("visible");
+    document.getElementById("pause-btn")!.classList.add("visible");
+    this.commentToggleBtn.classList.add("visible");
+
+    // 横画面ヒントを5秒後にフェードアウト
+    const hintEl = document.getElementById("hud-hint-landscape");
+    if (hintEl) {
+      this.hintFadeTimer = setTimeout(() => {
+        hintEl.style.opacity = "0";
+        this.hintFadeTimer = null;
+      }, 5000);
+    }
 
     this.refresh();
+  }
+
+  private updateCanvasCssVars(): void {
+    const canvas = document.querySelector("canvas");
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    document.documentElement.style.setProperty("--canvas-top", `${rect.top}px`);
+    document.documentElement.style.setProperty("--canvas-height", `${rect.height}px`);
   }
 
   setCollectedCount(n: number): void {
@@ -45,10 +68,28 @@ export class HUD {
     this.refresh();
   }
 
+  setDifficulty(name: string): void {
+    this.difficultyName = name;
+    this.difficultyEl.textContent = `${this.difficultyName}`;
+  }
+
+  setCommentEnabled(enabled: boolean): void {
+    this.commentToggleBtn.style.opacity = enabled ? "1" : "0.4";
+  }
+
+  destroy(): void {
+    if (this.hintFadeTimer !== null) {
+      clearTimeout(this.hintFadeTimer);
+      this.hintFadeTimer = null;
+    }
+    this.canvasObserver.disconnect();
+    document.getElementById("hud-overlay")!.classList.remove("visible");
+    document.getElementById("pause-btn")!.classList.remove("visible");
+    this.commentToggleBtn.classList.remove("visible");
+  }
+
   private refresh(): void {
-    this.receiptText.setText(
-      `レシート: ${this.collectedCount} / ${this.totalCount}`,
-    );
-    this.distanceText.setText(`距離: ${Math.floor(this.distance)}m`);
+    this.receiptsEl.textContent = `${this.collectedCount} / ${this.totalCount}`;
+    this.distanceEl.textContent = `${Math.floor(this.distance)}m`;
   }
 }

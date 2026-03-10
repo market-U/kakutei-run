@@ -1,46 +1,28 @@
 import Phaser from "phaser";
-import { AssetKeys } from "../assets/AssetKeys";
+import { AssetKeys, FrameCount } from "../assets/AssetKeys";
 import { gameConfig } from "../config/gameConfig";
-
-const RECEIPT_KEYS = [
-  AssetKeys.RECEIPT_1,
-  AssetKeys.RECEIPT_2,
-  AssetKeys.RECEIPT_3,
-] as const;
+import { ScrollableSprite } from "./ScrollableSprite";
 
 /** 収集可能なレシートアイテム */
-export class Receipt extends Phaser.GameObjects.Image {
-  readonly worldX: number;
-  readonly worldY: number;
-
-  /** 地面スクロール速度係数 */
-  private speedFactor: number;
-  /** 速度係数による累積移動量 (px) */
-  private extraScrolledX = 0;
+export class Receipt extends ScrollableSprite {
   /** 収集済みか */
   private _collected = false;
 
   constructor(scene: Phaser.Scene, worldX: number, worldY: number) {
-    const key = RECEIPT_KEYS[Math.floor(Math.random() * RECEIPT_KEYS.length)];
-    super(scene, worldX, worldY, key);
-
-    this.worldX = worldX;
-    this.worldY = worldY;
-
-    // ランダム速度係数
-    this.speedFactor =
-      gameConfig.receiptSpeedFactorMin +
-      Math.random() *
-        (gameConfig.receiptSpeedFactorMax - gameConfig.receiptSpeedFactorMin);
+    super(
+      scene,
+      worldX,
+      worldY,
+      AssetKeys.RECEIPT,
+      gameConfig.receiptSpeedFactorMin,
+      gameConfig.receiptSpeedFactorMax,
+    );
 
     scene.add.existing(this);
     this.setDepth(5);
-  }
+    this.createAnim(scene);
+    this.play("receipt_float");
 
-  updateScroll(scrolledX: number, scrollSpeed: number, delta: number): void {
-    // 速度係数による差分を累積する（時間経過とともに地面スクロールとのずれが広がる）
-    this.extraScrolledX += (scrollSpeed * (this.speedFactor - 1.0) * delta) / 1000;
-    this.x = this.worldX - scrolledX - this.extraScrolledX;
   }
 
   isVisible(): boolean {
@@ -55,6 +37,20 @@ export class Receipt extends Phaser.GameObjects.Image {
 
   isCollected(): boolean {
     return this._collected;
+  }
+
+  private createAnim(scene: Phaser.Scene): void {
+    if (!scene.anims.exists("receipt_float")) {
+      scene.anims.create({
+        key: "receipt_float",
+        frames: scene.anims.generateFrameNumbers(AssetKeys.RECEIPT, {
+          start: 0,
+          end: FrameCount.RECEIPT - 1,
+        }),
+        frameRate: 6,
+        repeat: -1,
+      });
+    }
   }
 
   getHitBounds(): Phaser.Geom.Rectangle {

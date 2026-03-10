@@ -37,6 +37,44 @@
 | テスト | Vitest |
 | デプロイ先 | Azure Static Web Apps |
 
+## アーキテクチャ
+
+本プロジェクトは **Phaser ゲーム層** と **HTML UI 層** の2層で構成されています。
+
+```text
+┌─────────────────────────────────────────┐
+│  HTML UI 層（index.html + TypeScript）   │
+│  ・タイトル画面  ・リザルト画面           │
+│  ・HUD オーバーレイ（レシート数・距離）    │
+│  ・ポーズオーバーレイ                     │
+│  ・向き切り替えボタン / ポーズボタン       │
+├─────────────────────────────────────────┤
+│  Phaser ゲーム層                         │
+│  ・BootScene（アセット読み込み）          │
+│  ・GameScene（ゲームプレイ本体）          │
+└─────────────────────────────────────────┘
+```
+
+### 層間の通信
+
+両層は `window.dispatchEvent` によるカスタムイベントで疎結合に通信します。
+
+| イベント名 | 発火元 | 受信先 | 内容 |
+|---|---|---|---|
+| `kakutei:assetsLoaded` | BootScene | TitleUI | アセット読み込み完了 |
+| `kakutei:startGame` | TitleUI | main.ts | ゲーム開始（difficultyId） |
+| `kakutei:gameResult` | GameScene | ResultUI | 結果通知（result / collected / total / difficultyId） |
+| `kakutei:retryGame` | ResultUI | main.ts | リトライ（difficultyId） |
+| `kakutei:orientationChanged` | OrientationManager | GameScene | 画面向き変化（orientation） |
+
+### 縦横画面対応
+
+`OrientationManager` が端末回転と手動ボタンの両方を処理します。
+
+- **縦画面**: Phaser キャンバス 960×1440、カメラは全体を表示
+- **横画面**: Phaser キャンバス 960×540（ゲームゾーンのみ）、Scale.FIT で画面にフィット
+- ゲーム中の向き変化時は自動的にポーズ状態になります
+
 ## セットアップ
 
 ```bash
@@ -97,17 +135,18 @@ src/
 │   ├── Stone.ts
 │   └── Witch.ts
 ├── scenes/              # Phaser シーン
-│   ├── BootScene.ts     # アセット読み込み
-│   ├── TitleScene.ts    # タイトル・難易度選択
-│   ├── GameScene.ts     # ゲーム本体
-│   └── ResultScene.ts   # リザルト・SNSシェア
+│   ├── BootScene.ts     # アセット読み込み（完了後 kakutei:assetsLoaded を発火）
+│   └── GameScene.ts     # ゲーム本体
 ├── systems/             # ゲームロジック
 │   ├── CollisionManager.ts
 │   ├── MapGenerator.ts
+│   ├── OrientationManager.ts  # 縦横画面の切り替え管理
 │   ├── ScrollManager.ts
 │   └── gameUtils.ts
 └── ui/
-    └── HUD.ts           # スコア・HP表示
+    ├── HUD.ts           # レシート数・距離のHTML要素更新
+    ├── TitleUI.ts       # タイトル画面（HTML）
+    └── ResultUI.ts      # リザルト画面（HTML）
 
 public/
 └── assets/

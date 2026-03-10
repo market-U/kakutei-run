@@ -35,6 +35,8 @@ jobs:
 
       - name: ビルド
         run: npm run build
+        env:
+          VITE_COMMENTS_URL: ${{ secrets.VITE_COMMENTS_URL }}
 
       - name: node_modules を削除（デプロイ対象から除外）
         run: rm -rf node_modules

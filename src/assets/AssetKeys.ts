@@ -7,12 +7,10 @@ export const AssetKeys = {
   PLAYER_BACK_PAIN: "player_back_pain",
   ENEMY_RUN: "enemy_run",
   WITCH_FLOAT: "witch_float",
+  RECEIPT: "receipt",
 
   // --- Static images ---
   TAX_OFFICE: "tax_office",
-  RECEIPT_1: "receipt_1",
-  RECEIPT_2: "receipt_2",
-  RECEIPT_3: "receipt_3",
   STONE_1: "stone_1",
   STONE_2: "stone_2",
   STONE_3: "stone_3",
@@ -31,6 +29,8 @@ export const FrameSize = {
   ENEMY: { width: 96, height: 144 },
   /** 魔女フレームサイズ (px) */
   WITCH: { width: 64, height: 64 },
+  /** レシートフレームサイズ (px) */
+  RECEIPT: { width: 32, height: 48 },
 } as const;
 
 /** 各スプライトシートのフレーム数 */
@@ -41,4 +41,5 @@ export const FrameCount = {
   PLAYER_BACK_PAIN: 6,
   ENEMY_RUN: 6,
   WITCH_FLOAT: 4,
+  RECEIPT: 6,
 } as const;

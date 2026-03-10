@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { AssetKeys, FrameSize, FrameCount } from "../assets/AssetKeys";
-import { CANVAS_W, CANVAS_H } from "../config/canvasConfig";
+import { CANVAS_W } from "../config/canvasConfig";
 
 /** アセット読み込みとローディング進捗表示を担当するシーン */
 export class BootScene extends Phaser.Scene {
@@ -15,7 +15,7 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.scene.start("TitleScene");
+    window.dispatchEvent(new CustomEvent("kakutei:assetsLoaded"));
   }
 
   // -------------------------------------------------
@@ -25,7 +25,7 @@ export class BootScene extends Phaser.Scene {
     const barW = 500;
     const barH = 24;
     const barX = (CANVAS_W - barW) / 2;
-    const barY = CANVAS_H / 2;
+    const barY = this.scale.height / 2;
 
     // 背景
     const bg = this.add.graphics();
@@ -113,13 +113,19 @@ export class BootScene extends Phaser.Scene {
         endFrame: FrameCount.WITCH_FLOAT - 1,
       },
     );
+    this.load.spritesheet(
+      AssetKeys.RECEIPT,
+      "/assets/sprites/receipt.png",
+      {
+        frameWidth: FrameSize.RECEIPT.width,
+        frameHeight: FrameSize.RECEIPT.height,
+        endFrame: FrameCount.RECEIPT - 1,
+      },
+    );
   }
 
   private loadStaticImages(): void {
     this.load.image(AssetKeys.TAX_OFFICE, "/assets/sprites/tax_office.png");
-    this.load.image(AssetKeys.RECEIPT_1, "/assets/sprites/receipt_1.png");
-    this.load.image(AssetKeys.RECEIPT_2, "/assets/sprites/receipt_2.png");
-    this.load.image(AssetKeys.RECEIPT_3, "/assets/sprites/receipt_3.png");
     this.load.image(AssetKeys.STONE_1, "/assets/sprites/stone_1.png");
     this.load.image(AssetKeys.STONE_2, "/assets/sprites/stone_2.png");
     this.load.image(AssetKeys.STONE_3, "/assets/sprites/stone_3.png");

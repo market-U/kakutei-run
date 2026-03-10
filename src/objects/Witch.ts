@@ -1,35 +1,25 @@
 import Phaser from "phaser";
 import { AssetKeys, FrameCount } from "../assets/AssetKeys";
 import { gameConfig } from "../config/gameConfig";
+import { ScrollableSprite } from "./ScrollableSprite";
 
 /**
  * 空中を右から左に移動する障害物。
  * 接触でプレーヤーに腰痛ペナルティを与える。
  */
-export class Witch extends Phaser.GameObjects.Sprite {
-  /** ワールド X 基準位置（出現時の右端からの論理位置） */
-  readonly worldX: number;
-  readonly worldY: number;
-
-  /** 地面スクロール速度係数 */
-  private speedFactor: number;
-  /** 速度係数による累積移動量 (px) */
-  private extraScrolledX = 0;
+export class Witch extends ScrollableSprite {
   /** 既にヒット済みか */
   private _consumed = false;
 
   constructor(scene: Phaser.Scene, worldX: number, worldY: number) {
-    super(scene, worldX, worldY, AssetKeys.WITCH_FLOAT);
-
-    this.worldX = worldX;
-    this.worldY = worldY;
-
-    // ランダム速度係数
-    this.speedFactor =
-      gameConfig.witchScrollSpeedFactorMin +
-      Math.random() *
-        (gameConfig.witchScrollSpeedFactorMax -
-          gameConfig.witchScrollSpeedFactorMin);
+    super(
+      scene,
+      worldX,
+      worldY,
+      AssetKeys.WITCH_FLOAT,
+      gameConfig.witchScrollSpeedFactorMin,
+      gameConfig.witchScrollSpeedFactorMax,
+    );
 
     scene.add.existing(this);
     this.setDepth(6);
@@ -49,18 +39,6 @@ export class Witch extends Phaser.GameObjects.Sprite {
         repeat: -1,
       });
     }
-  }
-
-  /**
-   * 毎フレーム更新。
-   * @param scrolledX 今フレームの累積スクロール量 (px)
-   * @param scrollSpeed 現在の地面スクロール速度 (px/s)
-   * @param delta フレーム経過時間 (ms)
-   */
-  updateScroll(scrolledX: number, scrollSpeed: number, delta: number): void {
-    // 速度係数による差分を累積する（時間経過とともに地面スクロールとのずれが広がる）
-    this.extraScrolledX += (scrollSpeed * (this.speedFactor - 1.0) * delta) / 1000;
-    this.x = this.worldX - scrolledX - this.extraScrolledX;
   }
 
   isVisible(): boolean {
