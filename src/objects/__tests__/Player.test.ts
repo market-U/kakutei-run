@@ -141,6 +141,22 @@ describe("PlayerStateManager: activateBackPain 空中被弾 (タスク 9.6)", ()
     expect(action).toBe("play_back_pain");
     expect(ps.isBackPain).toBe(true);
   });
+
+  it("転倒中（falling=true）で activateBackPain を呼ぶと none が返され isBackPain は変化しない (S5 無効化)", () => {
+    const ps = new PlayerStateManager();
+    ps._setFalling(true);
+    const action = ps.activateBackPain();
+    expect(action).toBe("none");
+    expect(ps.isBackPain).toBe(false);
+  });
+
+  it("石ころ被弾（triggerFall）直後に activateBackPain を呼ぶと none が返される（同フレーム衝突シナリオ）", () => {
+    const ps = new PlayerStateManager();
+    ps.triggerFall(); // → falling=true
+    const action = ps.activateBackPain();
+    expect(action).toBe("none");
+    expect(ps.isBackPain).toBe(false);
+  });
 });
 
 describe("PlayerStateManager: deactivateBackPain タイマー満了 (タスク 9.7)", () => {
