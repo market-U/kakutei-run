@@ -144,7 +144,7 @@ export class PlayerStateManager {
    * @returns 実行すべきアニメーションアクション
    */
   activateBackPain(): AnimAction {
-    if (this._gameOver) return "none";
+    if (this._gameOver || this._falling) return "none";
     this._isBackPain = true;
     if (this._grounded) {
       return "play_back_pain";
