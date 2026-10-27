@@ -2,8 +2,8 @@
 
 ## Task 1 依存関係と開発環境の更新
 
-- [ ] 1.1 Vite・Vitest と脆弱な間接依存を修正済み版に更新する
-- [ ] 1.2 必要な Node.js バージョンを package.json と README に明記する
+- [x] 1.1 Vite・Vitest と脆弱な間接依存を修正済み版に更新する
+- [x] 1.2 必要な Node.js バージョンを package.json と README に明記する
 
 ## Task 2 検証と結果の記録
 
