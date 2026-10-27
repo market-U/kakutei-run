@@ -15,7 +15,7 @@ develop の Dependabot に未解決の脆弱性アラートが16件あり、npm 
 
 ### New Capabilities
 
-追加なし。開発依存関係の保守更新として扱う。
+- `dependency-security`: 依存関係の脆弱性監査と開発環境の再現性に関する検証要件。
 
 ### Modified Capabilities
 
