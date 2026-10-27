@@ -3,7 +3,7 @@
 ## Task 1 実行環境と設定の更新
 
 - [x] 1.1 Node.js 24.22.1をインストールし nvm default を更新する
-- [ ] 1.2 .nvmrc・engines・README・CI アクションを更新する
+- [x] 1.2 .nvmrc・engines・README・CI アクションを更新する
 
 ## Task 2 統合検証
 
