@@ -34,3 +34,9 @@ OpenSpec strict 検証と git diff --check も成功した。
 ## 反映時の注意
 
 既に起動しているシェル・アプリの PATH は自動的には変わらない。新しいシェルは nvm default の24.22.1を使用し、このリポジトリでは nvm use で22.23.4を選択する。
+
+## GitHub 上での検証
+
+[CI run 40605934325](https://github.com/market-U/kakutei-run/actions/runs/40605934325) は成功した。setup-node と明示的なバージョン確認ログで22.23.4を確認し、テスト・ビルド・Azure プレビューデプロイが完了した。checkout・setup-node は v6 で成功した。
+
+PR #94 のタイトル・説明は依存関係と Node.js の両方を含む内容へ更新した。本番 main への反映は PR のマージと後続のリリース後になる。
