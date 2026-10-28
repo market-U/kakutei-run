@@ -16,16 +16,21 @@ jobs:
     runs-on: ubuntu-latest
     name: ビルドとデプロイ
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
           lfs: false
 
       - name: Node.js セットアップ
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
           cache: 'npm'
+
+      - name: Node.js バージョン確認
+        run: |
+          node --version
+          npm --version
 
       - name: 依存パッケージのインストール
         run: npm ci

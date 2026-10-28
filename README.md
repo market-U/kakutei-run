@@ -77,6 +77,25 @@
 
 ## セットアップ
 
+Node.js 22.23.4 以上の 22 系、または 24.22.1 以上の 24 系を使用してください。
+このリポジトリの推奨版と CI は `.nvmrc` の 24.22.1 に揃えています。
+
+```bash
+# nvm を使用してリポジトリ指定版をインストール・選択
+nvm install
+nvm use
+```
+
+Node.js 本体の脆弱性は `npm audit` の検査対象に含まれません。
+セキュリティ更新時は [Node.js 公式情報](https://nodejs.org/en/blog/vulnerability)を確認し、
+`.nvmrc` と `package.json` の `engines.node` の下限を更新してください。
+CI の checkout・setup-node 自体の Node.js ランタイムは GitHub が管理し、
+アプリのビルド用 Node.js とは別に更新されます。
+
+デプロイ時はビルド済みの `dist` を Azure Static Web Apps にアップロードし、
+Azure 側のアプリビルドはスキップします。本番のゲームは静的配信で、
+アプリ用の Node.js サーバーは実行しません。Azure 管理基盤とデプロイ用コンテナ内部の更新は Microsoft の管理範囲です。
+
 ```bash
 # 依存パッケージのインストール
 npm install
